@@ -4,64 +4,45 @@ using AracKiralamaPortal.Models;
 
 public class AccountController : Controller
 {
-    private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public AccountController(
-        UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager,
-        RoleManager<IdentityRole> roleManager)
+    public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
     {
-        _userManager = userManager;
         _signInManager = signInManager;
-        _roleManager = roleManager;
+        _userManager = userManager;
     }
 
-    // REGISTER
     [HttpGet]
-    public IActionResult Register() => View();
+    public IActionResult Login()
+    {
+        return View();
+    }
 
     [HttpPost]
-    public async Task<IActionResult> Register(string email, string password)
+    public async Task<IActionResult> Login(string username, string password)
     {
-        var user = new ApplicationUser { UserName = email, Email = email };
-        var result = await _userManager.CreateAsync(user, password);
+        var user = await _userManager.FindByNameAsync(username);
 
-        if (result.Succeeded)
+        if (user == null)
         {
-            await _signInManager.SignInAsync(user, false);
-            return RedirectToAction("Index", "Home");
+            ViewBag.Error = "Kullanıcı bulunamadı.";
+            return View();
         }
 
-        foreach (var error in result.Errors)
-            ModelState.AddModelError("", error.Description);
-
-        return View();
-    }
-
-    // LOGIN
-    [HttpGet]
-    public IActionResult Login() => View();
-
-    [HttpPost]
-    public async Task<IActionResult> Login(string email, string password)
-    {
-        var result = await _signInManager.PasswordSignInAsync(email, password, false, false);
+        var result = await _signInManager.PasswordSignInAsync(user, password, false, false);
 
         if (result.Succeeded)
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Dashboard", "Admin");
 
-        ModelState.AddModelError("", "Geçersiz giriş bilgileri");
+        ViewBag.Error = "Kullanıcı adı veya şifre hatalı.";
         return View();
     }
 
-    // LOGOUT
+
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Login");
     }
-
-    public IActionResult AccessDenied() => View();
 }

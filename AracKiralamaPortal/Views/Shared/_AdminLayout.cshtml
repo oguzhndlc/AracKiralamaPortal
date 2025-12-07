@@ -1,61 +1,104 @@
-﻿<!DOCTYPE html>
-<html>
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - Admin Panel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/admin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" />
+    <link href="~/admin/css/sb-admin-2.min.css" rel="stylesheet" />
 </head>
-<body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
+<body id="page-top">
 
-            <a class="navbar-brand" href="/Admin/Index">Admin Panel</a>
+    <div id="wrapper">
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navAdmin">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-            <div class="collapse navbar-collapse" id="navAdmin">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" asp-controller="Admin" asp-action="Dashboard">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Arac Panel</div>
+            </a>
 
-                <ul class="navbar-nav me-auto">
+            <hr class="sidebar-divider my-0">
 
-                    <li class="nav-item">
-                        <a class="nav-link @(Context.Request.Path.StartsWithSegments("/Brand") ? "active" : "")" href="/Brand/Index">
-                            Markalar
-                        </a>
-                    </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Dashboard" asp-controller="Admin">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link @(Context.Request.Path.StartsWithSegments("/Car") ? "active" : "")" href="/Car/Index">
-                            Araçlar
-                        </a>
-                    </li>
+            <hr class="sidebar-divider">
 
-                </ul>
+            <div class="sidebar-heading">Yönetim</div>
 
-                <form action="/Home/Index">
-                    <button asp-controller="Home" asp-action="Index" class="btn btn-outline-light" style="margin:10px;">Anasayfaya Dön</button>
-                </form>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Cars" asp-action="Index">
+                    <i class="fas fa-car"></i>
+                    <span>Araçlar</span>
+                </a>
+            </li>
 
-                <form method="post" action="/Login/Logout">
-                    <button class="btn btn-outline-light">Çıkış</button>
-                </form>
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Brands" asp-action="Index">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Markalar</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider d-none d-md-block">
+
+        </ul>
+        <!-- End Sidebar -->
+        <!-- Content -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <ul class="navbar-nav ml-auto">
+
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                               data-toggle="dropdown">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    @User.Identity.Name
+                                </span>
+                                <img class="img-profile rounded-circle"
+                                     src="~/admin/img/undraw_profile.svg">
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i>
+                                    Çıkış Yap
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
+                <!-- End Topbar -->
+
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
 
             </div>
-
         </div>
-    </nav>
-
-    <div class="container mt-4">
-        @RenderBody()
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.3/jquery.validate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
-
+    <script src="~/admin/vendor/jquery/jquery.min.js"></script>
+    <script src="~/admin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/admin/js/sb-admin-2.min.js"></script>
 </body>
 </html>
