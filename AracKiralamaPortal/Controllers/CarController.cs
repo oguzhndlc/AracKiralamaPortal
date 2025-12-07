@@ -148,6 +148,7 @@ namespace AracKiralamaPortal.Controllers
             existingCar.Year = car.Year;
             existingCar.Price = car.Price;
             existingCar.BrandId = car.BrandId;
+            existingCar.isAvailable = car.isAvailable;
 
             // Güncelle ve kaydet
             _unitOfWork.Cars.Update(existingCar);

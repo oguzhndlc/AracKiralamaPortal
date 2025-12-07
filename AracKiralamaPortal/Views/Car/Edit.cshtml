@@ -34,6 +34,14 @@
             </select>
         </div>
 
+        <div class="form-group">
+            <label>Araç Durumu</label>
+            <select asp-for="isAvailable" class="form-control">
+                <option value="true">Müsait</option>
+                <option value="false">Müsait Değil</option>
+            </select>
+        </div>
+
         <div class="form-group mt-3">
             <label>Mevcut Resim</label><br />
             @if (Model.ImagePath != null)

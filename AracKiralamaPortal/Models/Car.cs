@@ -24,5 +24,8 @@ namespace AracKiralamaPortal.Models
 
         public string? ImagePath { get; set; }
 
+        [Required(ErrorMessage = "Lütfen Araç Durumunu belirtin.")]
+        public bool isAvailable {  get; set; }
+
     }
 }

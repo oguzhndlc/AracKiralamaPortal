@@ -5,24 +5,18 @@
 namespace AracKiralamaPortal.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCarImage : Migration
+    public partial class Update1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "ImagePath",
-                table: "Cars",
-                type: "nvarchar(max)",
-                nullable: true);
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "ImagePath",
-                table: "Cars");
+
         }
     }
 }

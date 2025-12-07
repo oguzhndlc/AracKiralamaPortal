@@ -1,6 +1,9 @@
-using AracKiralamaPortal.Data;
 using AracKiralamaPortal.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using AracKiralamaPortal.Models;
+using AracKiralamaPortal.Data;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,12 +18,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-builder.Services.AddAuthentication("AdminCookie")
-    .AddCookie("AdminCookie", options =>
-    {
-        options.LoginPath = "/Login/Index";
-        options.AccessDeniedPath = "/Login/AccessDenied";
-    });
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
+
 
 
 

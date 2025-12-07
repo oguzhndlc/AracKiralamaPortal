@@ -33,6 +33,18 @@
                         <td>@item.Price ₺</td>
                         <td>@item.Brand.Name</td>
                         <td>
+                            @if (item.isAvailable)
+                            {
+                                <span class="text-muted">Müsait</span>
+
+                            }
+                            else
+                            {
+                                <span class="text-muted">Müsait Değil</span>
+
+                            }
+                    </td>
+                        <td>
                             @if (!string.IsNullOrEmpty(item.ImagePath))
                             {
                                 <img src="@item.ImagePath" width="120" />
