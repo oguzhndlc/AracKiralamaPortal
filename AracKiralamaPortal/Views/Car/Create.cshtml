@@ -1,0 +1,55 @@
+﻿@model AracKiralamaPortal.Models.Car
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-4">
+
+    <h3>Yeni Araç Ekle</h3>
+
+    <form method="post" enctype="multipart/form-data">
+
+        <div class="form-group mt-2">
+            <label>Resim</label>
+            <input type="file" name="imageFile" class="form-control" />
+        </div>
+
+
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <div class="form-group">
+            <label>Model</label>
+            <input asp-for="Model" class="form-control" />
+            <span asp-validation-for="Model" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-2">
+            <label>Yıl</label>
+            <input asp-for="Year" type="number" class="form-control" />
+            <span asp-validation-for="Year" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-2">
+            <label>Fiyat (₺)</label>
+            <input asp-for="Price" type="number" step="0.01" class="form-control" />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-2">
+            <label>Marka</label>
+            <select asp-for="BrandId" class="form-control">
+                @foreach (var brand in ViewBag.Brands)
+                {
+                    <option value="@brand.Id">@brand.Name</option>
+                }
+            </select>
+            <span asp-validation-for="BrandId" class="text-danger"></span>
+        </div>
+
+        <button class="btn btn-success mt-3">Kaydet</button>
+        <a href="/Car/Index" class="btn btn-secondary mt-3">Geri</a>
+
+    </form>
+
+</div>

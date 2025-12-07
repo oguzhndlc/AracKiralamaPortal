@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Admin Login";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <h3 class="text-center">Admin Giriş</h3>
+
+            <form method="post">
+                <div class="form-group">
+                    <label>Kullanıcı Adı</label>
+                    <input name="username" class="form-control" />
+                </div>
+
+                <div class="form-group mt-2">
+                    <label>Şifre</label>
+                    <input name="password" type="password" class="form-control" />
+                </div>
+
+                <button class="btn btn-primary w-100 mt-3">Giriş Yap</button>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger mt-3">@ViewBag.Error</div>
+                }
+            </form>
+        </div>
+    </div>
+</div>

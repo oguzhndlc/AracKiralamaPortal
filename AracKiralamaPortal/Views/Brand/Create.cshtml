@@ -1,0 +1,27 @@
+﻿@model AracKiralamaPortal.Models.Brand
+
+@{
+    ViewData["Title"] = "Yönetim Paneli";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<div class="container mt-4">
+
+    <h3>Yeni Marka Ekle</h3>
+
+    <form method="post">
+
+        <div class="form-group">
+            <label>Marka Adı</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <button class="btn btn-success mt-3">Kaydet</button>
+        <a href="/Brand/Index" class="btn btn-secondary mt-3">Geri</a>
+
+    </form>
+
+</div>

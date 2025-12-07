@@ -1,0 +1,46 @@
+﻿@model IEnumerable<AracKiralamaPortal.Models.Brand>
+
+@{
+    ViewData["Title"] = "Yönetim Paneli";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-4">
+
+    <h3>Markalar</h3>
+
+    <a href="/Brand/Create" class="btn btn-success mb-3">Yeni Marka Ekle</a>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Marka Adı</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var b in Model)
+            {
+                <tr>
+                    <td>@b.Id</td>
+                    <td>@b.Name</td>
+                    <td>
+                        <a href="/Brand/Edit/@b.Id" class="btn btn-primary btn-sm">Düzenle</a>
+                        <button class="btn btn-danger btn-sm" onclick="deleteBrand(@b.Id)">Sil</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function deleteBrand(id) {
+        if (confirm("Silmek istediğine emin misin?")) {
+            fetch('/Brand/Delete/' + id, {
+                method: 'POST'
+            }).then(() => location.reload());
+        }
+    }
+</script>
