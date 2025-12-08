@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AracKiralamaPortal.Controllers
 {
     // Bu controller'a sadece AdminCookie ile giriş yapan kullanıcılar erişebilir
-    [Authorize(AuthenticationSchemes = "AdminCookie")]
+    [Authorize(Roles = "Admin")]
     public class CarController : Controller
     {
         // Veritabanı işlemleri için UnitOfWork injection

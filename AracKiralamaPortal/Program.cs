@@ -28,41 +28,48 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
 
-    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.AccessDeniedPath = "/Home/Index";
 });
 
 var app = builder.Build();
 
 
-// -------------------------------------------------------------------------
-// ⭐ ADMIN ve ROLE OLUŞTURMA — UYGULAMA AÇILIRKEN ÇALIŞIR
-// -------------------------------------------------------------------------
+// Admin Rolü ve Kullanıcı Oluşturma
 using (var scope = app.Services.CreateScope())
 {
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
     // Admin rolü yoksa oluştur
     if (!await roleManager.RoleExistsAsync("Admin"))
-        await roleManager.CreateAsync(new IdentityRole("Admin"));
-
-    // Admin kullanıcı yoksa oluştur
-    var adminUser = await userManager.FindByNameAsync("admin");
-    if (adminUser == null)
     {
-        adminUser = new ApplicationUser
+        await roleManager.CreateAsync(new IdentityRole("Admin"));
+    }
+
+    // Varsayılan admin oluştur
+    string adminEmail = "admin@site.com";
+    string adminUser = "admin";
+    string adminPass = "Admin123!";
+
+    var existingAdmin = await userManager.FindByNameAsync(adminUser);
+    if (existingAdmin == null)
+    {
+        var newAdmin = new ApplicationUser
         {
-            UserName = "admin",
-            Email = "admin@site.com",
+            UserName = adminUser,
+            Email = adminEmail,
             EmailConfirmed = true
         };
 
-        // Şifre minimum gereksinimler: 1 büyük harf, 1 sayı vs.
-        await userManager.CreateAsync(adminUser, "Admin123!");
-        await userManager.AddToRoleAsync(adminUser, "Admin");
+        var result = await userManager.CreateAsync(newAdmin, adminPass);
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(newAdmin, "Admin");
+        }
     }
 }
-// -------------------------------------------------------------------------
+
 
 // ERROR HANDLER
 if (!app.Environment.IsDevelopment())

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using AracKiralamaPortal.Models;
+using AracKiralamaPortal.ViewModels; 
 
 public class AccountController : Controller
 {
@@ -13,36 +14,105 @@ public class AccountController : Controller
         _userManager = userManager;
     }
 
+    // LOGIN GET
     [HttpGet]
     public IActionResult Login()
     {
-        return View();
+        return View(new LoginViewModel());
     }
 
+    // LOGIN POST
     [HttpPost]
-    public async Task<IActionResult> Login(string username, string password)
+    public async Task<IActionResult> Login(LoginViewModel model)
     {
-        var user = await _userManager.FindByNameAsync(username);
+        if (!ModelState.IsValid)
+            return View(model);
 
-        if (user == null)
+        ApplicationUser user = null;
+
+        // Kullanıcı adı mı email mi?
+        if (model.UsernameOrEmail.Contains("@"))
         {
-            ViewBag.Error = "Kullanıcı bulunamadı.";
-            return View();
+            user = await _userManager.FindByEmailAsync(model.UsernameOrEmail);
+        }
+        else
+        {
+            user = await _userManager.FindByNameAsync(model.UsernameOrEmail);
         }
 
-        var result = await _signInManager.PasswordSignInAsync(user, password, false, false);
+        // Kullanıcı hiç yok → UYARI
+        if (user == null)
+        {
+            ViewBag.Error = "Böyle bir hesap bulunamadı.";
+            return View(model);
+        }
 
-        if (result.Succeeded)
+        // Şifre kontrolü
+        var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
+
+        // Şifre yanlış → UYARI
+        if (!result.Succeeded)
+        {
+            ViewBag.Error = "Şifre hatalı.";
+            return View(model);
+        }
+
+        // Başarılı giriş → Yönlendirme
+        if (await _userManager.IsInRoleAsync(user, "Admin"))
             return RedirectToAction("Dashboard", "Admin");
 
-        ViewBag.Error = "Kullanıcı adı veya şifre hatalı.";
-        return View();
+        return RedirectToAction("Index", "Home");
     }
 
 
+
+    // REGISTER GET
+    [HttpGet]
+    public IActionResult Register()
+    {
+        return View();
+    }
+
+    // REGISTER POST
+    [HttpPost]
+    public async Task<IActionResult> Register(RegisterViewModel model)
+    {
+        Console.WriteLine("Register POST tetiklendi");
+
+        if (!ModelState.IsValid)
+        {
+            Console.WriteLine("ModelState geçersiz");
+            return View(model);
+        }
+
+        var user = new ApplicationUser
+        {
+            UserName = model.Username,
+            Email = model.Email
+        };
+
+        var result = await _userManager.CreateAsync(user, model.Password);
+
+        if (result.Succeeded)
+        {
+            Console.WriteLine("Kullanıcı başarıyla oluşturuldu!");
+            return RedirectToAction("Login");
+        }
+
+        foreach (var error in result.Errors)
+        {
+            Console.WriteLine("Hata: " + error.Description);
+            ModelState.AddModelError("", error.Description);
+        }
+
+        return View(model);
+    }
+
+
+    // LOGOUT
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
-        return RedirectToAction("Login");
+        return RedirectToAction("Index","Home");
     }
 }

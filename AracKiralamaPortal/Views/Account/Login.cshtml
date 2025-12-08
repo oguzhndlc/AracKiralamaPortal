@@ -1,53 +1,50 @@
-﻿@{
-    Layout = null;
-}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Giriş Yap</title>
-    <link href="~/admin/css/sb-admin-2.min.css" rel="stylesheet" />
-</head>
-<body class="bg-gradient-primary">
+﻿@model AracKiralamaPortal.ViewModels.LoginViewModel
+<div style="width:30%; justify-self:center;">
+<h2>Giriş Yap</h2>
 
-    <div class="container">
+<form asp-action="Login" method="post" id="loginForm">
 
-        <div class="row justify-content-center">
-
-            <div class="col-xl-4 col-lg-5 col-md-6">
-
-                <div class="card o-hidden border-0 shadow-lg my-5">
-                    <div class="card-body p-4">
-
-                        <div class="text-center">
-                            <h1 class="h4 text-gray-900 mb-4">Giriş Yap</h1>
-                        </div>
-
-                        <form asp-action="Login">
-                            <div class="form-group">
-                                <input class="form-control" name="username" placeholder="Kullanıcı Adı" />
-                            </div>
-
-                            <div class="form-group">
-                                <input class="form-control" name="password" type="password" placeholder="Şifre" />
-                            </div>
-
-                            <button class="btn btn-primary btn-block" type="submit">Giriş Yap</button>
-
-                            @if (ViewBag.Error != null)
-                            {
-                                <p class="text-danger mt-2">@ViewBag.Error</p>
-                            }
-                        </form>
-
-
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
+    <div class="form-group">
+        <label>Kullanıcı Adı veya Email</label>
+        <input asp-for="UsernameOrEmail" class="form-control" />
     </div>
 
-</body>
-</html>
+    <div class="form-group position-relative">
+        <label>Şifre</label>
+
+        <input asp-for="Password" type="password" class="form-control" id="loginPassword" />
+
+        <!-- Göz ikonu -->
+        <span id="toggleLoginPassword"
+              style="position:absolute; right:10px; top:38px; cursor:pointer;">
+            <i class="fa-solid fa-eye"></i>
+        </span>
+    </div>
+
+    <button class="btn btn-primary mt-3" type="submit">Giriş Yap</button>
+
+    <div class="text-danger mt-2">
+        @Html.ValidationSummary(false)
+    </div>
+    @if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+</form>
+</div>
+
+@section Scripts {
+    <script>
+        const loginPwd = document.getElementById("loginPassword");
+        const togglePwd = document.getElementById("toggleLoginPassword");
+
+        togglePwd.addEventListener("click", function () {
+            const type = loginPwd.getAttribute("type") === "password" ? "text" : "password";
+            loginPwd.setAttribute("type", type);
+
+            this.innerHTML = type === "password"
+                ? '<i class="fa-solid fa-eye"></i>'
+                : '<i class="fa-solid fa-eye-slash"></i>';
+        });
+    </script>
+}

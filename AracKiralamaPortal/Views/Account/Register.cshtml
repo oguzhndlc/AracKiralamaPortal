@@ -1,5 +1,131 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@model AracKiralamaPortal.ViewModels.RegisterViewModel
+<div style="width:30%; justify-self:center;">
+<h2>Kayıt Ol</h2>
+
+<form asp-action="Register" method="post" id="registerForm">
+
+    <div class="form-group">
+        <label>Kullanıcı Adı</label>
+        <input asp-for="Username" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Email</label>
+        <input asp-for="Email" class="form-control" type="email" />
+    </div>
+
+    <!-- Şifre Alanı -->
+    <div class="form-group position-relative">
+        <label>Şifre</label>
+        <input asp-for="Password" class="form-control" type="password" id="passwordInput" />
+
+        <!-- Göz ikonu -->
+        <span id="togglePassword" style="position:absolute; right:10px; top:40px; cursor:pointer;">
+            <i class="fas fa-eye"></i>
+        </span>
+    </div>
+
+    <!-- Şifre Kuralları -->
+    <ul style="display:none; text-decoration:none;" class="mt-2" id="passwordRules">
+        <li id="ruleUpper">En az 1 büyük harf</li>
+        <li id="ruleLower">En az 1 küçük harf</li>
+        <li id="ruleDigit">En az 1 rakam</li>
+        <li id="ruleSpecial">En az 1 özel karakter</li>
+        <li id="ruleLength">En az 6 karakter</li>
+    </ul>
+
+    <!-- Confirm Password -->
+    <div class="form-group position-relative mt-3">
+        <label>Şifre Tekrar</label>
+        <input asp-for="ConfirmPassword" type="password" class="form-control" id="confirmInput" />
+
+        <span id="toggleConfirm" style="position:absolute; right:10px; top:40px; cursor:pointer;">
+            <i class="fas fa-eye"></i>
+        </span>
+    </div>
+
+    <span id="passwordError" class="text-danger"></span>
+
+    <button class="btn btn-primary mt-3" type="submit">Kayıt Ol</button>
+</form>
+</div>
+
+@section Scripts {
+    <script>
+        const passwordInput = document.getElementById("passwordInput");
+        const confirmInput = document.getElementById("confirmInput");
+
+        const passwordRules = document.getElementById("passwordRules");
+        const passwordError = document.getElementById("passwordError");
+
+        const ruleUpper = document.getElementById("ruleUpper");
+        const ruleLower = document.getElementById("ruleLower");
+        const ruleDigit = document.getElementById("ruleDigit");
+        const ruleSpecial = document.getElementById("ruleSpecial");
+        const ruleLength = document.getElementById("ruleLength");
+
+        function validatePassword() {
+            const pwd = passwordInput.value;
+
+            const upper = /[A-Z]/.test(pwd);
+            const lower = /[a-z]/.test(pwd);
+            const digit = /[0-9]/.test(pwd);
+            const special = /[^A-Za-z0-9]/.test(pwd);
+            const length = pwd.length >= 6;
+
+            ruleUpper.style.color = upper ? "green" : "red";
+            ruleLower.style.color = lower ? "green" : "red";
+            ruleDigit.style.color = digit ? "green" : "red";
+            ruleSpecial.style.color = special ? "green" : "red";
+            ruleLength.style.color = length ? "green" : "red";
+
+            const valid = upper && lower && digit && special && length;
+
+            passwordRules.style.display = valid ? "none" : "block";
+
+            return valid;
+        }
+
+        passwordInput.addEventListener("input", validatePassword);
+
+        // Form Submit Kontrolü
+        document.getElementById("registerForm").addEventListener("submit", function (e) {
+            passwordError.innerText = "";
+
+            if (!validatePassword()) {
+                e.preventDefault();
+                passwordError.innerText = "Şifre kurallara uygun değil!";
+                return;
+            }
+
+            if (passwordInput.value !== confirmInput.value) {
+                e.preventDefault();
+                passwordError.innerText = "Şifreler eşleşmiyor!";
+            }
+        });
+
+        // Şifre Göster/Gizle
+        document.getElementById("togglePassword").addEventListener("click", function () {
+            const icon = this.querySelector("i");
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                icon.classList.replace("fa-eye", "fa-eye-slash");
+            } else {
+                passwordInput.type = "password";
+                icon.classList.replace("fa-eye-slash", "fa-eye");
+            }
+        });
+
+        // Confirm Şifre Göster/Gizle
+        document.getElementById("toggleConfirm").addEventListener("click", function () {
+            const icon = this.querySelector("i");
+            if (confirmInput.type === "password") {
+                confirmInput.type = "text";
+                icon.classList.replace("fa-eye", "fa-eye-slash");
+            } else {
+                confirmInput.type = "password";
+                icon.classList.replace("fa-eye-slash", "fa-eye");
+            }
+        });
+    </script>
 }

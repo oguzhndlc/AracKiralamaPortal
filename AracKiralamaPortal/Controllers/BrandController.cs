@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AracKiralamaPortal.Controllers
 {
-    [Authorize(AuthenticationSchemes = "AdminCookie")]
+    [Authorize(Roles = "Admin")]
     public class BrandController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
