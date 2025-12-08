@@ -14,14 +14,14 @@ public class AccountController : Controller
         _userManager = userManager;
     }
 
-    // LOGIN GET
+    
     [HttpGet]
     public IActionResult Login()
     {
         return View(new LoginViewModel());
     }
 
-    // LOGIN POST
+    
     [HttpPost]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
@@ -30,7 +30,7 @@ public class AccountController : Controller
 
         ApplicationUser user = null;
 
-        // Kullanıcı adı mı email mi?
+        
         if (model.UsernameOrEmail.Contains("@"))
         {
             user = await _userManager.FindByEmailAsync(model.UsernameOrEmail);
@@ -40,24 +40,24 @@ public class AccountController : Controller
             user = await _userManager.FindByNameAsync(model.UsernameOrEmail);
         }
 
-        // Kullanıcı hiç yok → UYARI
+
         if (user == null)
         {
             ViewBag.Error = "Böyle bir hesap bulunamadı.";
             return View(model);
         }
 
-        // Şifre kontrolü
+        
         var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
 
-        // Şifre yanlış → UYARI
+        
         if (!result.Succeeded)
         {
             ViewBag.Error = "Şifre hatalı.";
             return View(model);
         }
 
-        // Başarılı giriş → Yönlendirme
+        
         if (await _userManager.IsInRoleAsync(user, "Admin"))
             return RedirectToAction("Dashboard", "Admin");
 
@@ -66,14 +66,14 @@ public class AccountController : Controller
 
 
 
-    // REGISTER GET
+
     [HttpGet]
     public IActionResult Register()
     {
         return View();
     }
 
-    // REGISTER POST
+
     [HttpPost]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
@@ -109,7 +109,7 @@ public class AccountController : Controller
     }
 
 
-    // LOGOUT
+    
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();

@@ -1,0 +1,58 @@
+﻿@model List<ApplicationUser>
+
+@using Microsoft.AspNetCore.Identity
+@using AracKiralamaPortal.Models
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Yönetim Paneli";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Kullanıcı Listesi</h2>
+
+<table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+            <th>Kullanıcı Adı</th>
+            <th>Email</th>
+            <th>Roller</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var user in Model)
+        {
+            var roles = await UserManager.GetRolesAsync(user);
+
+            <tr>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>
+                    @foreach (var role in roles)
+                    {
+                        <span class="badge bg-info text-white">@role</span>
+                    }
+                </td>
+
+                <td>
+                    @if (!roles.Contains("Admin"))
+                    {
+                        <form method="post" asp-action="MakeAdmin">
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <button class="btn btn-success btn-sm">Admin Yap</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-action="RemoveAdmin">
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <button class="btn btn-danger btn-sm">Admin Kaldır</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

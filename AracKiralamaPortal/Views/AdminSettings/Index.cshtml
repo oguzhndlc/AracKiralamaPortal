@@ -1,5 +1,10 @@
 ﻿@model SiteSettings
 
+@{
+    ViewData["Title"] = "Yönetim Paneli";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
 <h2>Site Ayarları</h2>
 
 @if (ViewBag.Message != null)
@@ -7,7 +12,7 @@
     <div class="alert alert-success">@ViewBag.Message</div>
 }
 
-<form method="post">
+<form style="width:40%;" method="post">
     <div class="form-group">
         <label>Site İsmi</label>
         <input class="form-control" name="SiteName" value="@Model.SiteName" />

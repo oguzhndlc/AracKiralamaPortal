@@ -1,28 +1,26 @@
-﻿using AracKiralamaPortal.Repositories;
-using Microsoft.EntityFrameworkCore;
+﻿using AracKiralamaPortal.Data;
+using AracKiralamaPortal.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using AracKiralamaPortal.Models;
-using AracKiralamaPortal.Data;
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Json
+// JSON Site Settings
 builder.Services.AddSingleton<SiteSettingsService>();
 
 // MVC
 builder.Services.AddControllersWithViews();
 
-// DbContext
+// DB CONTEXT
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Repository DI
+// REPOSITORY
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-// Identity
+// IDENTITY
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
@@ -30,55 +28,41 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
-
     options.AccessDeniedPath = "/Home/Index";
 });
 
 var app = builder.Build();
 
 
-// Admin Rolü ve Kullanıcı Oluşturma
+// =========================================================
+// 📌 ROL SEED — Roller kaybolmasın diye güvenli yöntem
+// =========================================================
+async Task SeedRoles(IServiceProvider services)
+{
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    if (!await roleManager.RoleExistsAsync("Admin"))
+        await roleManager.CreateAsync(new IdentityRole("Admin"));
+
+    if (!await roleManager.RoleExistsAsync("User"))
+        await roleManager.CreateAsync(new IdentityRole("User"));
+}
+
+
+// =========================================================
+// 📌 Uygulama başladığında 1 kez rolleri oluşturuyor
+// =========================================================
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-
-    // Admin rolü yoksa oluştur
-    if (!await roleManager.RoleExistsAsync("Admin"))
-    {
-        await roleManager.CreateAsync(new IdentityRole("Admin"));
-    }
-
-    // Varsayılan admin oluştur
-    string adminEmail = "admin@site.com";
-    string adminUser = "admin";
-    string adminPass = "Admin123!";
-
-    var existingAdmin = await userManager.FindByNameAsync(adminUser);
-    if (existingAdmin == null)
-    {
-        var newAdmin = new ApplicationUser
-        {
-            UserName = adminUser,
-            Email = adminEmail,
-            EmailConfirmed = true
-        };
-
-        var result = await userManager.CreateAsync(newAdmin, adminPass);
-
-        if (result.Succeeded)
-        {
-            await userManager.AddToRoleAsync(newAdmin, "Admin");
-        }
-    }
+    await SeedRoles(scope.ServiceProvider);
 }
+
 
 
 // ERROR HANDLER
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");     
-
+    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
@@ -91,9 +75,15 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Routes
+// ROUTING
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+
+/*
+string adminEmail = "admin@site.com";
+string adminUser = "admin";
+string adminPass = "Admin123!";*/
