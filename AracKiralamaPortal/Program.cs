@@ -8,6 +8,9 @@ using AracKiralamaPortal.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Json
+builder.Services.AddSingleton<SiteSettingsService>();
+
 // MVC
 builder.Services.AddControllersWithViews();
 

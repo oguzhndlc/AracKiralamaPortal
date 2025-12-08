@@ -1,5 +1,7 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@inject SiteSettingsService SettingsService
+@{
+    var settings = SettingsService.GetSettings();
+    ViewData["Title"] = "Ana Sayfa";
 }
 @model List<AracKiralamaPortal.Models.Car>
 
@@ -35,7 +37,7 @@
                     {
                         <span class="badge bg-danger">Müsait Değil</span>
                     }
-                    <a style="margin-left:15px;"><br><br>Bizi Arayın : <strong>+90 555 444 33 22</strong></a>
+                    <a style="margin-left:15px;"><br><br>Bizi Arayın : <strong>@settings.CompanyPhone</strong></a>
                 </div>
             </div>
         </div>

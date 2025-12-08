@@ -6,6 +6,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="~/caricon.png">
+
     <title>@ViewData["Title"] - Admin Panel</title>
 
     <link href="~/admin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" />
@@ -50,6 +52,13 @@
                 <a class="nav-link" asp-controller="Brand" asp-action="Index">
                     <i class="fas fa-warehouse"></i>
                     <span>Markalar</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="AdminSettings" asp-action="Index">
+                    <i class="fas fa-cog"></i>
+                    <span>Site Ayarları</span>
                 </a>
             </li>
 
