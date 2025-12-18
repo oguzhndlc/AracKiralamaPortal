@@ -115,4 +115,12 @@ public class AccountController : Controller
         await _signInManager.SignOutAsync();
         return RedirectToAction("Index","Home");
     }
+
+    [HttpPost]
+    public async Task<IActionResult> LogoutAjax()
+    {
+        await _signInManager.SignOutAsync();
+        return Json(new { success = true });
+    }
+
 }

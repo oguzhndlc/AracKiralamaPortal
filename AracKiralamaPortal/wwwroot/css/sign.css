@@ -1,0 +1,150 @@
+﻿/* ================= BODY ================= */
+.login-page {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ================= GLASS CARD ================= */
+.glass-card {
+    scale:1.2;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 2.5rem;
+    width: 380px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 14px 40px rgba(0,0,0,0.6);
+    }
+
+/* ================= TITLE ================= */
+.login-title {
+    color: #00f5ff;
+    text-shadow: 0 0 8px #00f5ff;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+/* ================= INPUT GROUP ================= */
+.input-group {
+    margin-bottom: 1.2rem;
+    position: relative;
+    text-align: left;
+}
+
+    .input-group label {
+        display: block;
+        color: #fff;
+        font-weight: 500;
+        margin-bottom: 0.3rem;
+    }
+
+.input-field {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(0,245,255,0.3);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    outline: none;
+    transition: all 0.3s;
+}
+
+    .input-field:focus {
+        border-color: #00f5ff;
+        box-shadow: 0 0 8px #00f5ff;
+    }
+
+/* ================= PASSWORD TOGGLE ================= */
+.password-group {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #00f5ff;
+    font-size: 1rem; /* Gerekirse ayarla */
+    transition: 0.3s;
+}
+
+    .toggle-password:hover {
+        color: #fff;
+        text-shadow: 0 0 6px #00f5ff;
+    }
+
+/* ================= PASSWORD STRENGTH ================= */
+.strength-bar {
+    height: 5px;
+    background: #ff3860;
+    border-radius: 4px;
+    margin-top: 5px;
+    transition: all 0.3s;
+}
+
+.password-info {
+    display: none;
+    text-align: left;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+    .password-info ul {
+        padding-left: 20px;
+    }
+
+    .password-info li {
+        margin-bottom: 3px;
+        color: #ff3860;
+    }
+
+/* ================= BUTTON ================= */
+.btn-glass {
+    width: 100%;
+    padding: 0.6rem 0;
+    border: none;
+    border-radius: 999px;
+    background: rgba(0,245,255,0.15);
+    color: #00f5ff;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+    .btn-glass:hover {
+        background: rgba(0,245,255,0.3);
+        color: #fff;
+        box-shadow: 0 0 12px #00f5ff;
+    }
+
+/* ================= SHAKE ANIMATION ================= */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    20%, 60% {
+        transform: translateX(-5px);
+    }
+
+    40%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+.shake {
+    animation: shake 0.3s;
+}

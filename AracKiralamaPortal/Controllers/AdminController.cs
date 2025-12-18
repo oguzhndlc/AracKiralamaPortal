@@ -53,24 +53,52 @@ public class AdminController : Controller
     {
         var user = await _userManager.FindByIdAsync(userId);
 
-        if (user != null)
+        if (user == null)
+            return Json(new { success = false });
+
+        if (!await _userManager.IsInRoleAsync(user, "Admin"))
         {
             await _userManager.AddToRoleAsync(user, "Admin");
         }
 
-        return RedirectToAction("Users");
+        return Json(new
+        {
+            success = true,
+            isAdmin = true
+        });
     }
+
 
     [HttpPost]
     public async Task<IActionResult> RemoveAdmin(string userId)
     {
+        // Giriş yapan admin
+        var currentUserId = _userManager.GetUserId(User);
+
+        // Kendi adminliğini kaldırmayı engelle
+        if (userId == currentUserId)
+        {
+            return Json(new
+            {
+                success = false,
+                message = "Kendi adminliğini kaldıramazsın!"
+            });
+        }
+
         var user = await _userManager.FindByIdAsync(userId);
 
-        if (user != null)
+        if (user == null)
+            return Json(new { success = false });
+
+        if (await _userManager.IsInRoleAsync(user, "Admin"))
         {
             await _userManager.RemoveFromRoleAsync(user, "Admin");
         }
 
-        return RedirectToAction("Users");
+        return Json(new
+        {
+            success = true,
+            isAdmin = false
+        });
     }
 }

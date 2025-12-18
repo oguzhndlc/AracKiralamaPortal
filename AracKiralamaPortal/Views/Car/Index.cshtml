@@ -1,85 +1,226 @@
-﻿    @model IEnumerable<AracKiralamaPortal.Models.Car>
-    @{
-        Layout = "~/Views/Shared/_AdminLayout.cshtml";
-        ViewData["Title"] = "Admin Paneli";
+﻿@model IEnumerable<AracKiralamaPortal.Models.Car>
 
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Araç Yönetimi";
+}
+
+<style>
+    body {
+        background: #0b0f1a;
     }
 
-    <div class="container mt-4">
+    /* CARD */
+    .neon-card {
+        background: #111827;
+        border-radius: 18px;
+        border: 1px solid rgba(0,245,255,.15);
+        box-shadow: 0 0 30px rgba(0,245,255,.08);
+    }
 
-        <h3>Araçlar</h3>
+    .neon-title {
+        color: #00f5ff;
+        text-shadow: 0 0 10px rgba(0,245,255,.6);
+        font-weight: 700;
+    }
 
-        <a href="/Car/Create" class="btn btn-primary mb-3">Yeni Araç Ekle</a>
+    /* BUTTONS */
+    .neon-btn {
+        text-decoration:none;
+        background: linear-gradient(135deg, #00f5ff, #a855f7);
+        border: none;
+        color: #000;
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 10px 22px;
+        box-shadow: 0 0 25px rgba(0,245,255,.5);
+        transition: .3s;
+    }
 
-        <table class="table table-bordered table-striped">
+        .neon-btn:hover {
+            text-decoration:none;
+            color:white;
+            transform: translateY(-1px);
+            box-shadow: 0 0 35px rgba(168,85,247,.9);
+        }
+
+    /* TABLE */
+    table {
+        color: #e5e7eb;
+    }
+
+        table thead th {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        table tbody tr {
+            color:white;
+            transition: background .3s ease;
+            border-radius: 12px;
+        }
+
+            table tbody tr:hover {
+                background: rgba(0,245,255,.08);
+            }
+
+    /* STATUS BADGE */
+    .status-badge {
+        padding: 6px 16px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        user-select: none;
+        display: inline-block;
+        transition: .3s;
+        box-shadow: 0 0 10px rgba(0,0,0,.3);
+    }
+
+    .available {
+        color:white;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        box-shadow: 0 0 12px rgba(34,197,94,.6);
+    }
+
+    .not-available {
+        color:white;
+        background: linear-gradient(135deg, #ef4444, #b91c1c);
+        box-shadow: 0 0 12px rgba(239,68,68,.6);
+    }
+
+    /* IMAGE */
+    .car-image {
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,.1);
+        box-shadow: 0 0 12px rgba(0,0,0,.4);
+        max-width: 120px;
+    }
+
+    /* ACTION BUTTONS */
+    .action-btn {
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+</style>
+
+<div class="container mt-5 mb-5">
+
+    <div class="card neon-card p-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="neon-title mb-0">
+                <i class="bi bi-car-front-fill me-2"></i> Araçlar
+            </h4>
+
+            <a href="/Car/Create" class="neon-btn">
+                + Yeni Araç
+            </a>
+        </div>
+
+        <table class="table table-borderless align-middle">
             <thead>
                 <tr>
-                    <th>Id</th>
+                    <th>#</th>
                     <th>Model</th>
                     <th>Yıl</th>
                     <th>Fiyat</th>
                     <th>Marka</th>
-                    <th>İşlemler</th>
+                    <th>Durum</th>
+                    <th>Resim</th>
+                    <th class="text-end">İşlemler</th>
                 </tr>
             </thead>
 
             <tbody>
                 @foreach (var item in Model)
                 {
-                    <tr>
+                    <tr id="row_@item.Id">
                         <td>@item.Id</td>
                         <td>@item.Model</td>
                         <td>@item.Year</td>
                         <td>@item.Price ₺</td>
                         <td>@item.Brand.Name</td>
+
                         <td>
-                            @if (item.isAvailable)
-                            {
-                                <span class="text-muted" style="background-color:green; border-radius:10px; padding:5px;"> <a style="color:white; text-decoration:none;">Müsait</a></span>
+                            <span id="status_@item.Id"
+                                  class="status-badge @(item.isAvailable ? "available" : "not-available")"
+                                  onclick="carAvailable(@item.Id)">
+                                @(item.isAvailable ? "Müsait" : "Müsait Değil")
+                            </span>
+                        </td>
 
-                            }
-                            else
-                            {
-                            <span class="text-muted" style="background-color:red; border-radius:10px; padding:5px;"> <a style="color:white; text-decoration:none;">Müsait Değil</a></span>
-
-                            }
-                    </td>
                         <td>
                             @if (!string.IsNullOrEmpty(item.ImagePath))
                             {
-                                <img src="@item.ImagePath" width="120" />
+                                <img src="@item.ImagePath" class="car-image" />
                             }
                             else
                             {
                                 <span class="text-muted">Resim yok</span>
                             }
                         </td>
-                        <td>
-                            <a href="/Car/Edit/@item.Id" class="btn btn-warning btn-sm">Düzenle</a>
 
-                            <button class="btn btn-danger btn-sm" onclick="deleteCar(@item.Id)">Sil</button>
+                        <td class="text-end">
+                            <a href="/Car/Edit/@item.Id"
+                               class="btn btn-warning btn-sm action-btn">
+                                Düzenle
+                            </a>
+
+                            <button class="btn btn-danger btn-sm action-btn"
+                                    onclick="deleteCar(@item.Id)">
+                                Sil
+                            </button>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
+
     </div>
+</div>
 
-    <script>
-        function deleteCar(id) {
-            if (!confirm("Bu aracı silmek istediğine emin misin?")) return;
+<script>
+    function deleteCar(id) {
+        if (!confirm("Bu aracı silmek istediğine emin misin?")) return;
 
-            $.ajax({
-                type: "POST",
-                url: "/Car/Delete/" + id,
-                success: function () {
-                    alert("Araç silindi!");
-                    location.reload();
-                },
-                error: function () {
-                    alert("Silme işleminde hata oluştu!");
+        $.ajax({
+            type: "POST",
+            url: "/Car/Delete/" + id,
+            success: function () {
+                $("#row_" + id).fadeOut(400);
+            },
+            error: function () {
+                alert("Silme işleminde hata oluştu!");
+            }
+        });
+    }
+
+    function carAvailable(id) {
+        $.ajax({
+            type: "POST",
+            url: "/Car/UpdateAvailability",
+            data: { id: id },
+            success: function (res) {
+                if (!res.success) return;
+
+                let badge = $("#status_" + id);
+
+                if (res.isAvailable) {
+                    badge.text("Müsait")
+                         .removeClass("not-available")
+                         .addClass("available");
+                } else {
+                    badge.text("Müsait Değil")
+                         .removeClass("available")
+                         .addClass("not-available");
                 }
-            });
-        }
-    </script>
-
+            },
+            error: function () {
+                alert("Durum güncellenirken hata oluştu!");
+            }
+        });
+    }
+</script>

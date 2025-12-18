@@ -3,8 +3,16 @@ using AracKiralamaPortal.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AracKiralamaPortal.Models;
+using System.Globalization;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+// 🌍 KÜLTÜR AYARI (TR)
+var culture = new CultureInfo("tr-TR");
+CultureInfo.DefaultThreadCurrentCulture = culture;
+CultureInfo.DefaultThreadCurrentUICulture = culture;
+
 
 // JSON Site Settings
 builder.Services.AddSingleton<SiteSettingsService>();
@@ -34,9 +42,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 var app = builder.Build();
 
 
-// =========================================================
-// 📌 ROL SEED — Roller kaybolmasın diye güvenli yöntem
-// =========================================================
+
 async Task SeedRoles(IServiceProvider services)
 {
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
@@ -48,14 +54,43 @@ async Task SeedRoles(IServiceProvider services)
         await roleManager.CreateAsync(new IdentityRole("User"));
 }
 
+async Task SeedAdmin(IServiceProvider services)
+{
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-// =========================================================
-// 📌 Uygulama başladığında 1 kez rolleri oluşturuyor
-// =========================================================
+    string adminUsername = "admin";
+    string adminEmail = "admin@site.com";
+    string adminPassword = "Admin123!";
+
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+    if (adminUser == null)
+    {
+        adminUser = new ApplicationUser
+        {
+            UserName = adminUsername,
+            Email = adminEmail,
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(adminUser, adminPassword);
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(adminUser, "Admin");
+        }
+    }
+}
+
+
+
+
 using (var scope = app.Services.CreateScope())
 {
     await SeedRoles(scope.ServiceProvider);
+    await SeedAdmin(scope.ServiceProvider);
 }
+
 
 
 
@@ -81,9 +116,3 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-
-
-/*
-string adminEmail = "admin@site.com";
-string adminUser = "admin";
-string adminPass = "Admin123!";*/

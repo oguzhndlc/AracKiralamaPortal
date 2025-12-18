@@ -2,189 +2,231 @@
 using AracKiralamaPortal.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace AracKiralamaPortal.Controllers
 {
-    // Bu controller'a sadece AdminCookie ile giriş yapan kullanıcılar erişebilir
     [Authorize(Roles = "Admin")]
     public class CarController : Controller
     {
-        // Veritabanı işlemleri için UnitOfWork injection
         private readonly IUnitOfWork _unitOfWork;
+        private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
 
         public CarController(IUnitOfWork unitOfWork)
         {
-            // Constructor üzerinden UnitOfWork'i alıyoruz
             _unitOfWork = unitOfWork;
         }
 
-        // Araç listesi sayfası
         public IActionResult Index()
         {
-            // Tüm araçları markalarıyla birlikte (Include) getiriyoruz
             var cars = _unitOfWork.Cars.GetAll(q => q.Include(c => c.Brand));
             return View(cars);
         }
 
-        // Araç ekleme sayfası (GET)
+        /* ===================== CREATE ===================== */
+
         [HttpGet]
         public IActionResult Create()
         {
-            // Marka dropdown'ı için tüm markaları ViewBag ile gönderiyoruz
-            ViewBag.Brands = _unitOfWork.Brands.GetAll().ToList();
+            PopulateDropdowns();
             return View();
         }
 
-        // Araç ekleme işlemi (POST)
         [HttpPost]
         public IActionResult Create(Car car, IFormFile imageFile)
         {
-            // Model is valid mi (zorunlu alanlar dolu mu)
-            if (ModelState.IsValid)
+            if (imageFile != null)
             {
-                // Eğer bir resim yüklenmişse
-                if (imageFile != null && imageFile.Length > 0)
+                var ext = Path.GetExtension(imageFile.FileName).ToLower();
+                if (!_allowedExtensions.Contains(ext))
                 {
-                    // Resimlerin kaydedileceği klasör
-                    string uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/cars");
-
-                    // Klasör yoksa oluştur
-                    if (!Directory.Exists(uploadDir))
-                        Directory.CreateDirectory(uploadDir);
-
-                    // Benzersiz dosya adı oluştur
-                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-
-                    // Tam kayıt yolunu oluştur
-                    string filePath = Path.Combine(uploadDir, fileName);
-
-                    // Dosyayı fiziksel olarak sunucuya kaydet
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        imageFile.CopyTo(stream);
-                    }
-
-                    // Araba nesnesine resim yolunu kaydet
-                    car.ImagePath = "/images/cars/" + fileName;
+                    ModelState.AddModelError("", "Sadece resim dosyaları yüklenebilir (jpg, png, webp).");
                 }
-
-                // Aracı veritabanına ekle
-                _unitOfWork.Cars.Add(car);
-                _unitOfWork.Save();
-
-                return RedirectToAction("Index");
             }
 
-            // ModelState hata varsa markaları tekrar gönderiyoruz
-            ViewBag.Brands = _unitOfWork.Brands.GetAll().ToList();
-            return View(car);
-        }
+            if (!ModelState.IsValid)
+            {
+                TempData["ToastErrors"] = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage) ? "Alan geçersiz" : e.ErrorMessage)
+                    .ToList();
 
-        // Araç düzenleme sayfası (GET)
-        [HttpGet]
-        public IActionResult Edit(int id)
-        {
-            // Id'ye göre aracı al
-            var car = _unitOfWork.Cars.Get(id);
+                PopulateDropdowns(car);
+                return View(car);
+            }
 
-            // Kategori dropdown için tüm markalar
-            ViewBag.Brands = _unitOfWork.Brands.GetAll().ToList();
-
-            return View(car);
-        }
-
-        // Araç düzenleme işlemi (POST)
-        [HttpPost]
-        public IActionResult Edit(Car car, IFormFile imageFile)
-        {
-            // Düzenlenecek aracı eski haliyle al
-            var existingCar = _unitOfWork.Cars.Get(car.Id);
-
-            if (existingCar == null)
-                return NotFound();
-
-            // Eski resmi sakla
-            string oldImage = existingCar.ImagePath;
-
-            // Eğer yeni resim yüklenmişse
             if (imageFile != null && imageFile.Length > 0)
             {
-                string uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/cars");
-
-                if (!Directory.Exists(uploadDir))
-                    Directory.CreateDirectory(uploadDir);
-
-                // Yeni resim dosya adı
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-                string filePath = Path.Combine(uploadDir, fileName);
-
-                // Yeni resmi yükle
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    imageFile.CopyTo(stream);
-                }
-
-                // Eski resim var ise sil
-                if (!string.IsNullOrEmpty(oldImage))
-                {
-                    string oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", oldImage.TrimStart('/'));
-
-                    if (System.IO.File.Exists(oldPath))
-                        System.IO.File.Delete(oldPath);
-                }
-
-                // Yeni resim yolunu kaydet
-                existingCar.ImagePath = "/images/cars/" + fileName;
+                car.ImagePath = UploadImage(imageFile);
             }
-            else
+
+            _unitOfWork.Cars.Add(car);
+            _unitOfWork.Save();
+            TempData["ToastSuccess"] = "Araç başarıyla eklendi.";
+            return RedirectToAction("Index");
+        }
+
+            /* ===================== EDIT ===================== */
+
+            [HttpGet]
+            public IActionResult Edit(int id)
             {
-                // Yeni resim yüklenmediyse eski resmi koru
-                existingCar.ImagePath = oldImage;
+                var car = _unitOfWork.Cars.Get(id);
+                if (car == null) return NotFound();
+
+                PopulateDropdowns(car);
+                return View(car);
             }
 
-            // Diğer alanları güncelle
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Car car, IFormFile? imageFile)
+        {
+            var existingCar = _unitOfWork.Cars.Get(car.Id);
+            if (existingCar == null) return NotFound();
+
+            // ❌ Eğer yeni resim YOKSA → HİÇ DOKUNMA
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var ext = Path.GetExtension(imageFile.FileName).ToLower();
+                if (!_allowedExtensions.Contains(ext))
+                {
+                    ModelState.AddModelError("", "Sadece jpg, png veya webp dosyaları yüklenebilir.");
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(car.Color))
+            {
+                ModelState.AddModelError("Color", "Lütfen bir renk seçin.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                // Hata mesajlarını TempData’ya koy
+                TempData["ToastErrors"] = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                PopulateDropdowns(existingCar);
+                return View(existingCar);
+            }
+
+
+            // ✅ YENİ RESİM VARSA GÜNCELLE
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                existingCar.ImagePath = UploadImage(imageFile, existingCar.ImagePath);
+            }
+            // ❗ YOKSA → DOKUNMA → eski resim aynen kalır
+
+            // 🔁 Diğer alanlar
             existingCar.Model = car.Model;
             existingCar.Year = car.Year;
             existingCar.Price = car.Price;
             existingCar.BrandId = car.BrandId;
             existingCar.isAvailable = car.isAvailable;
+            existingCar.FuelType = car.FuelType;
+            existingCar.GearType = car.GearType;
+            existingCar.Mileage = car.Mileage;
+            existingCar.EngineCapacity = car.EngineCapacity;
+            existingCar.EnginePower = car.EnginePower;
+            existingCar.HasAC = car.HasAC;
+            existingCar.HasGPS = car.HasGPS;
+            existingCar.Color = car.Color;
 
-            // Güncelle ve kaydet
             _unitOfWork.Cars.Update(existingCar);
             _unitOfWork.Save();
 
+            TempData["ToastSuccess"] = "Araç başarıyla güncellendi.";
             return RedirectToAction("Index");
         }
 
-        // Araç silme işlemi
+
+        /* ===================== DELETE ===================== */
+
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            // Silinecek aracı bul
             var car = _unitOfWork.Cars.Get(id);
+            if (car == null) return NotFound();
 
-            if (car == null)
-                return NotFound();
-
-            // Fotoğraf varsa fiziksel olarak sil
             if (!string.IsNullOrEmpty(car.ImagePath))
             {
-                string fullPath = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "wwwroot",
-                    car.ImagePath.TrimStart('/')
-                );
-
-                if (System.IO.File.Exists(fullPath))
-                    System.IO.File.Delete(fullPath);
+                DeleteImage(car.ImagePath);
             }
 
-            // Aracı veritabanından sil
             _unitOfWork.Cars.Remove(car);
             _unitOfWork.Save();
 
             return Ok();
+        }
+
+        /* ===================== AVAILABILITY ===================== */
+
+        [HttpPost]
+        public IActionResult UpdateAvailability(int id)
+        {
+            var car = _unitOfWork.Cars.Get(id);
+            if (car == null) return NotFound();
+
+            car.isAvailable = !car.isAvailable;
+            _unitOfWork.Cars.Update(car);
+            _unitOfWork.Save();
+
+            return Json(new { success = true, isAvailable = car.isAvailable });
+        }
+
+        /* ===================== HELPERS ===================== */
+
+        private string UploadImage(IFormFile imageFile, string? oldImagePath = null)
+        {
+            string uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/cars");
+            if (!Directory.Exists(uploadDir))
+                Directory.CreateDirectory(uploadDir);
+
+            string fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
+            string filePath = Path.Combine(uploadDir, fileName);
+
+            using var stream = new FileStream(filePath, FileMode.Create);
+            imageFile.CopyTo(stream);
+
+            if (!string.IsNullOrEmpty(oldImagePath))
+            {
+                DeleteImage(oldImagePath);
+            }
+
+            return "/images/cars/" + fileName;
+        }
+
+        private void DeleteImage(string imagePath)
+        {
+            string fullPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                imagePath.TrimStart('/')
+            );
+
+            if (System.IO.File.Exists(fullPath))
+                System.IO.File.Delete(fullPath);
+        }
+
+        private void PopulateDropdowns(Car? car = null)
+        {
+            ViewBag.Brands = new SelectList(_unitOfWork.Brands.GetAll(), "Id", "Name", car?.BrandId);
+
+            var fuelTypes = new List<string> { "Benzin", "Dizel", "Elektrik", "Hibrit", "LPG" };
+            ViewBag.FuelTypes = new SelectList(fuelTypes, car?.FuelType);
+
+            var gearTypes = new List<string> { "Manuel", "Otomatik", "Yarı-Otomatik" };
+            ViewBag.GearTypes = new SelectList(gearTypes, car?.GearType);
+
+            ViewBag.Availability = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "true", Text = "🟢 Müsait", Selected = car?.isAvailable == true },
+                new SelectListItem { Value = "false", Text = "🔴 Müsait Değil", Selected = car?.isAvailable == false }
+            };
         }
     }
 }

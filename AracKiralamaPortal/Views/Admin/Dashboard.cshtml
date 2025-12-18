@@ -2,74 +2,109 @@
     ViewData["Title"] = "Dashboard";
     Layout = "_AdminLayout";
 }
-<h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
 
-<div class="row">
+<link href="~/css/site.css" rel="stylesheet" />
 
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            Toplam Araç
-                        </div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            <p class="text-2xl font-bold">@ViewBag.TotalCars</p>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-car fa-2x text-gray-300"></i>
-                    </div>
+<style>
+    body {
+        background: #0b0f1a;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .neon-card {
+        background: #111827;
+        border-radius: 20px;
+        border: 2px solid rgba(0, 245, 255, 0.2);
+        box-shadow: 0 0 30px rgba(0, 245, 255, 0.1);
+        padding: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .neon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 40px rgba(0, 245, 255, 0.4);
+        }
+
+    .neon-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #00f5ff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+        text-shadow: 0 0 8px #00f5ff, 0 0 16px rgba(0,245,255,.3);
+    }
+
+    .neon-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #ffffff;
+        text-shadow: 0 0 10px rgba(0,245,255,0.5);
+    }
+
+    .neon-icon {
+        font-size: 2.5rem;
+        color: #00f5ff;
+        text-shadow: 0 0 10px rgba(0,245,255,0.5);
+    }
+
+    .dashboard-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .dashboard-col {
+        flex: 1 1 250px;
+    }
+</style>
+
+<h1 class="neon-title">Dashboard</h1>
+
+<div class="dashboard-row">
+    <!-- Toplam Araç -->
+    <div class="dashboard-col">
+        <div class="neon-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div class="neon-title">Toplam Araç</div>
+                    <div class="neon-value">@ViewBag.TotalCars</div>
+                </div>
+                <div>
+                    <i class="fas fa-car neon-icon"></i>
                 </div>
             </div>
         </div>
     </div>
 
-</div>
-
-<div class="row">
-
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            Toplam Marka
-                        </div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            <p class="text-2xl font-bold">@ViewBag.TotalBrands</p>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-car fa-2x text-gray-300"></i>
-                    </div>
+    <!-- Toplam Marka -->
+    <div class="dashboard-col">
+        <div class="neon-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div class="neon-title">Toplam Marka</div>
+                    <div class="neon-value">@ViewBag.TotalBrands</div>
+                </div>
+                <div>
+                    <i class="fas fa-tags neon-icon"></i>
                 </div>
             </div>
         </div>
     </div>
 
-</div>
-<div class="row">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            Toplam Kullanıcı
-                        </div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">
-                            <p class="text-2xl font-bold">@ViewBag.TotalUsers</p>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-user fa-2x text-gray-300"></i>
-                    </div>
+    <!-- Toplam Kullanıcı -->
+    <div class="dashboard-col">
+        <div class="neon-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div class="neon-title">Toplam Kullanıcı</div>
+                    <div class="neon-value">@ViewBag.TotalUsers</div>
+                </div>
+                <div>
+                    <i class="fas fa-user neon-icon"></i>
                 </div>
             </div>
         </div>
     </div>
-
 </div>

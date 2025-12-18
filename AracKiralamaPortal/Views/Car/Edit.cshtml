@@ -1,65 +1,244 @@
 ﻿@model AracKiralamaPortal.Models.Car
-
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-<div class="container mt-4">
 
-    <h3>Araç Düzenle</h3>
+<link href="~/css/car.css" rel="stylesheet" />
 
-    <form method="post" enctype="multipart/form-data">
-
-        <div class="form-group">
-            <label>Model</label>
-            <input asp-for="Model" class="form-control" />
+<div class="container mt-5 mb-5">
+    <div class="card neon-card">
+        <div class="neon-header">
+            <h4 class="neon-title">Araç Düzenle</h4>
         </div>
 
-        <div class="form-group">
-            <label>Yıl</label>
-            <input asp-for="Year" class="form-control" />
+        <div class="card-body">
+            <form asp-action="Edit" asp-controller="Car" method="post" enctype="multipart/form-data" id="carForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="row g-4">
+
+                    <!-- Mevcut Resim -->
+                    <div class="col-md-6">
+                        <label class="form-label">Mevcut Resim</label><br />
+
+                        <label class="neon-upload" id="imageLabel">
+                            <img src="@Model.ImagePath"
+                                 class="img-fluid rounded"
+                                 style="max-width:220px;" />
+                        </label>
+                    </div>
+
+                    <!-- Yeni Resim -->
+                    <div class="col-md-6">
+                        <label class="form-label">Yeni Resim</label>    
+
+                        <label class="neon-upload" id="imageLabel">
+                            <span id="imageLabelText">Resim Seç</span>
+                            <img id="imageInLabel" class="img-fluid rounded d-none" style="max-height:120px; margin-top:8px;" />
+                            <input type="file"
+                                   name="imageFile"
+                                   accept="image/*"
+                                   onchange="previewNewImageInLabel(event)" />
+                        </label>
+                    </div>
+
+
+                    <!-- TEMEL -->
+                    <div class="col-md-6">
+                        <label class="form-label">Model</label>
+                        <input asp-for="Model" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Yıl</label>
+                        <input asp-for="Year" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Fiyat</label>
+                        <input asp-for="Price" class="form-control" type="number" step="0.01" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Kilometre</label>
+                        <input asp-for="Mileage" class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Motor Gücü (hp)</label>
+                        <input asp-for="EnginePower" class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Motor Hacmi (cc)</label>
+                        <input asp-for="EngineCapacity" class="form-control" />
+                    </div>
+
+                    <!-- SEÇİMLER -->
+                    <div class="col-md-6">
+                        <label class="form-label">Marka</label>
+                        <select asp-for="BrandId" asp-items="ViewBag.Brands" class="form-select"></select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Yakıt</label>
+                        <select asp-for="FuelType" asp-items="ViewBag.FuelTypes" class="form-select"></select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Vites</label>
+                        <select asp-for="GearType" asp-items="ViewBag.GearTypes" class="form-select"></select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Durum</label>
+                        <select asp-for="isAvailable" class="form-select">
+                            <option value="true">Müsait</option>
+                            <option value="false">Değil</option>
+                        </select>
+                    </div>
+
+                    <!-- RENK -->
+                    <div class="col-md-6">
+                        <label class="form-label">Renk</label>
+
+                        <div class="d-flex align-items-center gap-3 mt-2">
+                            <!-- Seçili Renk Göstergesi -->
+                            <div id="selectedColorLabel" class="selected-color-label">
+                                Renk Seçilmedi
+                            </div>
+
+                            <!-- Renkler -->
+                            <div class="color-badges" id="colorBadges">
+                                <span class="color-badge" data-color="Siyah" style="--c:#000000"></span>
+                                <span class="color-badge" data-color="Beyaz" style="--c:#ffffff"></span>
+                                <span class="color-badge" data-color="Gri" style="--c:#6b7280"></span>
+                                <span class="color-badge" data-color="Gümüş" style="--c:#cbd5e1"></span>
+                                <span class="color-badge" data-color="Kırmızı" style="--c:#dc2626"></span>
+                                <span class="color-badge" data-color="Bordo" style="--c:#7f1d1d"></span>
+                                <span class="color-badge" data-color="Mavi" style="--c:#2563eb"></span>
+                                <span class="color-badge" data-color="Lacivert" style="--c:#1e3a8a"></span>
+                                <span class="color-badge" data-color="Turkuaz" style="--c:#06b6d4"></span>
+                                <span class="color-badge" data-color="Yeşil" style="--c:#16a34a"></span>
+                                <span class="color-badge" data-color="Zeytin Yeşili" style="--c:#4d7c0f"></span>
+                                <span class="color-badge" data-color="Sarı" style="--c:#facc15"></span>
+                                <span class="color-badge" data-color="Altın Sarısı" style="--c:#f59e0b"></span>
+                                <span class="color-badge" data-color="Turuncu" style="--c:#f97316"></span>
+                                <span class="color-badge" data-color="Mor" style="--c:#7c3aed"></span>
+                                <span class="color-badge" data-color="Kahverengi" style="--c:#78350f"></span>
+                                <span class="color-badge" data-color="Şampanya" style="--c:#e5d3b3"></span>
+                                <span class="color-badge" data-color="Bronz" style="--c:#92400e"></span>
+                                <span class="color-badge" data-color="Pembe" style="--c:#ec4899"></span>
+                            </div>
+                        </div>
+
+                        <input asp-for="Color" type="hidden" id="Color"/>
+                    </div>
+                    <!-- DONANIM -->
+                    <div class="col-md-6">
+                        <label class="form-label">Donanım</label>
+
+                        <label class="neon-toggle">
+                            <input asp-for="HasAC" type="checkbox" />
+                            <span class="toggle"></span>
+                            <span class="toggle-text">Klima</span>
+                        </label>
+
+                        <label class="neon-toggle">
+                            <input asp-for="HasGPS" type="checkbox" />
+                            <span class="toggle"></span>
+                            <span class="toggle-text">GPS</span>
+                        </label>
+                    </div>
+
+
+                </div>
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="back-btn">
+                       Geri Dön
+                    </a>
+
+                    <button type="submit" class="neon-btn">
+                        Kaydet
+                    </button>
+
+                </div>
+
+            </form>
         </div>
-
-        <div class="form-group">
-            <label>Fiyat</label>
-            <input asp-for="Price" class="form-control" />
-        </div>
-
-        <div class="form-group">
-            <label>Marka</label>
-            <select asp-for="BrandId" class="form-control">
-                @foreach (var brand in ViewBag.Brands)
-                {
-                    <option value="@brand.Id">@brand.Name</option>
-                }
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Araç Durumu</label>
-            <select asp-for="isAvailable" class="form-control">
-                <option value="true">Müsait</option>
-                <option value="false">Müsait Değil</option>
-            </select>
-        </div>
-
-        <div class="form-group mt-3">
-            <label>Mevcut Resim</label><br />
-            @if (Model.ImagePath != null)
-            {
-                <img src="@Model.ImagePath" width="150" />
-            }
-            else
-            {
-                <p class="text-muted">Resim yok</p>
-            }
-        </div>
-
-        <div class="form-group mt-2">
-            <label>Yeni Resim Yükle</label>
-            <input type="file" name="imageFile" class="form-control" />
-        </div>
-
-        <button class="btn btn-primary mt-3">Kaydet</button>
-    </form>
-
+    </div>
 </div>
+<script src="~/js/site.js"></script>
+<script>
+    /* === RESİM ÖNİZLEME (EDIT) === */
+    function previewNewImageInLabel(e) {
+        const labelText = document.getElementById("imageLabelText");
+        const imgInLabel = document.getElementById("imageInLabel");
+
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            imgInLabel.src = URL.createObjectURL(file);
+            imgInLabel.classList.remove("d-none");
+
+            // İsteğe bağlı: yazıyı gizleyebilirsin
+            labelText.style.display = "none";
+        }
+    }
+    function previewNewImage(e) {
+        const box = document.getElementById("newPreviewBox");
+        const img = document.getElementById("newPreviewImg");
+
+        if (box && img) {
+            box.classList.remove("d-none");
+            img.src = URL.createObjectURL(e.target.files[0]);
+        }
+    }
+
+    /* === RENK SEÇİM === */
+    const badges = document.querySelectorAll(".color-badge");
+    const input = document.getElementById("Color");
+    const label = document.getElementById("selectedColorLabel");
+
+    badges.forEach(badge => {
+
+        // EDIT SAYFASI → mevcut renk otomatik seçili gelsin
+        if (input && badge.dataset.color === input.value) {
+            selectColor(badge);
+        }
+
+        badge.addEventListener("click", () => {
+            selectColor(badge);
+        });
+    });
+
+    function selectColor(badge) {
+        badges.forEach(b => b.classList.remove("selected"));
+        badge.classList.add("selected");
+
+        if (label) {
+            const bg = badge.style.getPropertyValue("--c");
+            label.textContent = badge.dataset.color;
+            label.style.backgroundColor = bg;
+            label.style.color = bg === "#ffffff" ? "#000" : "#fff";
+        }
+
+        if (input) {
+            input.value = badge.dataset.color;
+        }
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        const currentColor = input.value;
+        if (!currentColor) return;
+
+        badges.forEach(badge => {
+            if (badge.dataset.color === currentColor) {
+                selectColor(badge);
+            }
+        });
+    });
+
+</script>
+
+

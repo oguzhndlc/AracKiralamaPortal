@@ -1,22 +1,74 @@
+﻿/* ===== GENEL BİLEŞEN STİLLERİ (Layout Harici) ===== */
+
 html {
-  font-size: 14px;
+    position: relative;
+    min-height: 100%;
+    height: 100%; /* EKLE: Tam pencere yüksekliği */
+    font-size: 15px;
 }
+body {
+    /* DÜZELT: Fixed Navbar offset'i ve margin kaldırıldı */
+    /* padding-top: var(--navbar-height); kuralı SİLİNDİ */
+    margin-bottom: 0;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #e2e8f0;
+    font-family: 'Segoe UI', sans-serif;
+    /* YENİ: Flexbox Layout Sabitleme Kuralları */
+    min-height: 100vh; /* Body'yi tam ekran yüksekliğine ayarlar */
+    display: flex; /* İçerikleri dikey sıralamak için flexbox etkinleştirilir */
+    flex-direction: column; /* Navbar, Container ve Footer'ı dikey hizalar */
+}
+/* ===== FOCUS STYLES ===== */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    outline: none;
+}
+
+/* ===== TOAST NOTIFICATION ===== */
+.toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+/* Container sağ alt köşe, toast’lar burada birikir */
+.toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px; /* sağ alt */
+    display: flex;
+    flex-direction: column-reverse; /* en yeni en altta */
+    gap: 10px; /* toast’lar arası boşluk */
+    z-index: 99999;
+}
+
+/* Toast tasarımı */
+.toast-notification {
+    background-color: darkcyan;
+    color: #fff;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px 20px;
+    box-shadow: 0 0 15px rgba(0,245,255,0.3);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+    pointer-events: none;
+}
+
+    /* Animasyon için */
+    .toast-notification.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  margin-bottom: 60px;
+    html {
+        font-size: 16px;
+    }
 }

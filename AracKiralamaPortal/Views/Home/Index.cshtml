@@ -5,42 +5,45 @@
 }
 @model List<AracKiralamaPortal.Models.Car>
 
-<h2 class="mb-4">Araçlarımız</h2>
+<link href="~/css/site.css" rel="stylesheet" />
+<link href="~/css/home.css" rel="stylesheet" />
 
-<div class="row">
+<h2 class="mb-4 text-light">Araç Filomuz</h2>
 
+<div class="row row-equal-height">
     @foreach (var car in Model)
     {
-        <div class="col-md-4 mb-4">
-            <div class="card shadow">
+        if (car.isAvailable)
+        {
+            <div class="col-md-4 mb-4 d-flex">
+                <div class="car-card glass-card flex-fill">
 
-                <!-- Araç Görseli -->
-                <img class="card-img-top"
-                     src="@car.ImagePath"
-                     style="height:220px; object-fit:cover;"
-                     alt="Araç Resmi" />
+                    <div class="availability">Müsait</div>
 
-                <div class="card-body">
-                    <h5 class="card-title">@car.Brand?.Name @car.Model</h5>
+                    <div class="car-title">
+                        @car.Brand?.Name @car.Model
+                    </div>
 
-                    <p class="card-text">
-                        <strong>Yıl:</strong> @car.Year <br />
-                        <strong>Günlük Fiyat:</strong> @car.Price ₺
-                    </p>
+                    <div class="car-image">
+                        <img src="@car.ImagePath" alt="Araç">
+                    </div>
 
-                    <!-- Durum Rozeti -->
-                    @if (car.isAvailable)
-                    {
-                        <span class="badge bg-success">Müsait</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-danger">Müsait Değil</span>
-                    }
-                    <a style="margin-left:15px;"><br><br>Bizi Arayın : <strong>@settings.CompanyPhone</strong></a>
+                    <div class="car-features">
+                        <span>🚘 @car.GearType</span>
+                        <span>⛽ @car.FuelType</span>
+                        <span> @(car.HasAC ? "❄️ Klima" : "❌ Klima")</span>
+                        <span> @(car.HasGPS ? "🧭 GPS" : "❌ GPS")</span>
+                    </div>
+
+                    <div class="car-footer">
+                        <div class="car-price">
+                            @car.Price ₺ <span>/gün</span>
+                        </div>
+                        <a href="#" class="rent-btn">Hemen Kirala</a>
+                    </div>
+
                 </div>
             </div>
-        </div>
+        }
     }
-
 </div>

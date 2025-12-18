@@ -1,0 +1,202 @@
+﻿/* ===== LAYOUT STYLES: HTML, BODY, NAVBAR, DROPDOWN, CONTAINER, FOOTER (Flexbox Fixed) ===== */
+
+:root {
+    --navbar-height: 64px; /* Navbar yüksekliği */
+}
+
+
+
+
+
+
+/* ===== NAVBAR (Flexbox uyumlu hale getirildi) ===== */
+.navbar {
+    /* DÜZELT: Fixed Konumlandırma Kuralları Kaldırıldı */
+    /* position: fixed; top: 0; width: 100%; left: 0; right: 0; SİLİNDİ */
+    
+    height: var(--navbar-height);
+    display: flex;
+    align-items: center; 
+    background: rgba(15, 32, 39, 0.75) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    z-index: 1050;
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: #38bdf8 !important;
+    letter-spacing: .5px;
+}
+
+.nav-link {
+    color: #e2e8f0 !important;
+    font-weight: 500;
+    transition: color .3s ease;
+}
+
+    .nav-link:hover {
+        color: #38bdf8 !important;
+    }
+
+.active-link {
+    color: #38bdf8 !important;
+    font-weight: 700;
+    position: relative;
+    text-shadow: 0 0 12px rgba(56,189,248,.8);
+}
+
+    .active-link::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -6px;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, #38bdf8, #7c3aed);
+        box-shadow: 0 0 10px #38bdf8;
+        border-radius: 10px;
+    }
+
+/* ===== DROPDOWN MENU ===== */
+.dropdown-toggle {
+    border-radius: 30px;
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    transition: background .3s ease, box-shadow .3s ease;
+}
+
+    .dropdown-toggle:hover {
+        background: rgba(56,189,248,.15);
+        box-shadow: 0 0 20px rgba(56,189,248,.4);
+    }
+
+    .dropdown-toggle span {
+        transform: translateX(20px);
+        opacity: 0;
+        transition: all .4s ease;
+    }
+
+    .dropdown-toggle:hover span {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .dropdown-toggle::after {
+        content: none !important;
+    }
+
+.dropdown-menu {
+    background: rgba(10, 20, 30, 0.85);
+    backdrop-filter: blur(16px);
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.08);
+    z-index: 1060 !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,.6), 0 0 30px rgba(56,189,248,.35);
+    padding: 10px;
+    min-width: 210px;
+}
+
+.dropdown-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: 500;
+    color: #e2e8f0;
+    transition: color .3s ease;
+}
+
+    .dropdown-item i {
+        transition: transform .35s ease, text-shadow .35s ease;
+    }
+
+    .dropdown-item:hover {
+        color: white;
+        background: transparent;
+    }
+
+/* ===== NEON ANIMATIONS (DROPDOWN İÇİN) ===== */
+.custom-item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    border-radius: 12px;
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform .4s ease, opacity .4s ease;
+    z-index: -1;
+}
+
+.custom-item:hover::before {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+.logout-item::before {
+    background: linear-gradient(90deg, rgba(239,68,68,.8), rgba(185,28,28,.9));
+    box-shadow: 0 0 25px rgba(239,68,68,.6);
+}
+
+.logout-item:hover i {
+    transform: translateX(4px) rotate(-8deg);
+    text-shadow: 0 0 12px rgba(248,113,113,.9);
+    color: #22c55e;
+}
+
+.logout-item:hover {
+    color: #fff !important;
+}
+
+.login-item::before, .register-item::before {
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+    box-shadow: 0 0 20px rgba(34,197,94,.6);
+}
+
+.login-item i, .register-item i {
+    color: #22c55e;
+}
+
+.login-item:hover i, .register-item:hover i {
+    transform: translateX(2px) rotate(-4deg);
+    text-shadow: 0 0 8px rgba(34,197,94,.8);
+}
+
+.login-item:hover, .register-item:hover {
+    color: #fff !important;
+}
+
+/* ===== CONTAINER (KAYDIRMA BÖLGESÝ) ===== */
+.container {
+    /* YENİ: Kalan alanı kapla ve kaydırmayı etkinleştir */
+    flex-grow: 1; /* Navbar ve Footer'dan sonra kalan tüm dikey alanı kaplar */
+    overflow-y: auto; /* Bu alan içinde kaydırma çubuğu görünür */
+    padding-bottom: 30px; /* Alttaki footer'a sıkışmaması için ek boşluk */
+    
+    background: rgba(15, 32, 39, 0.55);
+    backdrop-filter: blur(14px);
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.06);
+    margin-top: 30px;
+}
+
+main {
+    /* DÜZELT: Flexbox yönetimi nedeniyle artık min-height gerekmiyor */
+    min-height: auto;
+}
+
+footer {
+    background: rgba(15,32,39,.75);
+    border-top: 1px solid rgba(255,255,255,.06);
+    color: #94a3b8 !important;
+    text-align: center;
+    padding: 20px 0;
+    font-size: .85rem;
+}

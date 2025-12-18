@@ -5,54 +5,204 @@
 @inject UserManager<ApplicationUser> UserManager
 
 @{
-    ViewData["Title"] = "Yönetim Paneli";
+    ViewData["Title"] = "Kullanıcı Yönetimi";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h2>Kullanıcı Listesi</h2>
+<style>
+    body {
+        background: #0b0f1a;
+        font-family: 'Segoe UI', sans-serif;
+    }
 
-<table class="table table-bordered mt-3">
-    <thead>
-        <tr>
-            <th>Kullanıcı Adı</th>
-            <th>Email</th>
-            <th>Roller</th>
-            <th>İşlemler</th>
-        </tr>
-    </thead>
+    /* CARD */
+    .neon-card {
+        background: #111827;
+        border-radius: 20px;
+        border: 2px solid rgba(0, 245, 255, 0.2);
+        box-shadow: 0 0 40px rgba(0, 245, 255, 0.1);
+        padding: 30px;
+    }
 
-    <tbody>
-        @foreach (var user in Model)
-        {
-            var roles = await UserManager.GetRolesAsync(user);
+    .neon-title {
+        color: #00f5ff;
+        font-weight: 700;
+        text-shadow: 0 0 10px #00f5ff, 0 0 20px rgba(0,245,255,.4);
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+    }
 
-            <tr>
-                <td>@user.UserName</td>
-                <td>@user.Email</td>
-                <td>
-                    @foreach (var role in roles)
-                    {
-                        <span class="badge bg-info text-white">@role</span>
-                    }
-                </td>
+    /* TABLE */
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+        color: #e5e7eb;
+    }
 
-                <td>
-                    @if (!roles.Contains("Admin"))
-                    {
-                        <form method="post" asp-action="MakeAdmin">
-                            <input type="hidden" name="userId" value="@user.Id" />
-                            <button class="btn btn-success btn-sm">Admin Yap</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form method="post" asp-action="RemoveAdmin">
-                            <input type="hidden" name="userId" value="@user.Id" />
-                            <button class="btn btn-danger btn-sm">Admin Kaldır</button>
-                        </form>
-                    }
-                </td>
-            </tr>
+        table thead th {
+            color: #9ca3af;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: left;
+            padding: 10px 20px;
         }
-    </tbody>
-</table>
+
+        table tbody tr {
+            color:white;
+            background: #1f2937;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,245,255,0.1);
+            cursor: default;
+        }
+
+            table tbody tr:hover {
+                background: #0f172a;
+                transform: scale(1.01);
+                box-shadow: 0 0 20px rgba(0,245,255,0.4);
+            }
+
+        table td {
+            padding: 12px 20px;
+            vertical-align: middle;
+        }
+
+    /* BADGE */
+    .role-badge {
+        font-size: 12px;
+        padding: 6px 14px;
+        border-radius: 50px;
+        color: #fff;
+        margin-right: 6px;
+        display: inline-block;
+        background: linear-gradient(135deg, #3b82f6, #06b6d4);
+        text-shadow: 0 0 6px rgba(0,245,255,0.5);
+        box-shadow: 0 0 8px rgba(0,245,255,0.4);
+        transition: transform 0.2s ease;
+    }
+
+        .role-badge:hover {
+            transform: scale(1.1);
+        }
+
+    /* BUTTONS */
+    .action-btn {
+        border-radius: 999px;
+        padding: 8px 20px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 8px rgba(0,245,255,0.2);
+    }
+
+        .action-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 0 20px rgba(0,245,255,0.5);
+        }
+
+    .btn-admin {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: #000;
+        border: none;
+    }
+
+    .btn-remove {
+        background: linear-gradient(135deg, #ef4444, #b91c1c);
+        color: #fff;
+        border: none;
+    }
+</style>
+
+<div class="container mt-5 mb-5">
+
+    <div class="neon-card">
+
+        <h4 class="neon-title">
+            <i class="bi bi-people-fill me-2"></i> Kullanıcılar
+        </h4>
+
+        <table class="table table-borderless align-middle">
+            <thead>
+                <tr>
+                    <th>Kullanıcı Adı</th>
+                    <th>Email</th>
+                    <th>Roller</th>
+                    <th class="text-end">İşlem</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    var roles = await UserManager.GetRolesAsync(user);
+
+                    <tr>
+                        <td>@user.UserName</td>
+                        <td>@user.Email</td>
+
+                        <td id="roles_@user.Id">
+                            @foreach (var role in roles)
+                            {
+                                <span class="role-badge">@role</span>
+                            }
+                        </td>
+
+                        <td class="text-end" id="action_@user.Id">
+                            <button class="action-btn @(roles.Contains("Admin") ? "btn-remove" : "btn-admin")"
+                                    onclick="toggleAdmin('@user.Id', @(roles.Contains("Admin").ToString().ToLower()))">
+                                @(roles.Contains("Admin") ? "Admin Kaldır" : "Admin Yap")
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<script>
+    function toggleAdmin(userId, isAdmin) {
+        let url = isAdmin
+            ? '/Admin/RemoveAdmin'
+            : '/Admin/MakeAdmin';
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: { userId: userId },
+            success: function (res) {
+                if (!res.success && res.message) {
+                    showToast(res.message);
+                    return;
+                }
+                if (!res.success) return;
+
+                let actionCell = $("#action_" + userId);
+                let roleCell = $("#roles_" + userId);
+
+                if (res.isAdmin) {
+                    actionCell.html(`
+                        <button class="action-btn btn-remove"
+                                onclick="toggleAdmin('${userId}', true)">
+                            Admin Kaldır
+                        </button>
+                    `);
+                    roleCell.append(`<span class="role-badge">Admin</span>`);
+                } else {
+                    actionCell.html(`
+                        <button class="action-btn btn-admin"
+                                onclick="toggleAdmin('${userId}', false)">
+                            Admin Yap
+                        </button>
+                    `);
+                    roleCell.find(".role-badge:contains('Admin')").remove();
+                }
+            },
+            error: function () {
+                showToast("İşlem sırasında hata oluştu!");
+            }
+        });
+    }
+</script>

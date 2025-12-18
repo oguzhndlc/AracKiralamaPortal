@@ -1,46 +1,234 @@
 ﻿@model IEnumerable<AracKiralamaPortal.Models.Brand>
 
 @{
-    ViewData["Title"] = "Yönetim Paneli";
+    ViewData["Title"] = "Marka Yönetimi";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container mt-4">
+<style>
+    body {
+        background: #0b0f1a;
+        overflow-x: hidden;
+    }
 
-    <h3>Markalar</h3>
+    /* CARD */
+    .neon-card {
+        background: #111827;
+        border-radius: 18px;
+        border: 1px solid rgba(0,245,255,.15);
+        box-shadow: 0 0 30px rgba(0,245,255,.08);
+    }
 
-    <a href="/Brand/Create" class="btn btn-success mb-3">Yeni Marka Ekle</a>
+    .neon-title {
+        color: #00f5ff;
+        text-shadow: 0 0 10px rgba(0,245,255,.6);
+        font-weight: 700;
+    }
 
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Marka Adı</th>
-                <th>İşlem</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var b in Model)
-            {
+    /* BUTTONS */
+    .neon-btn {
+        background: linear-gradient(135deg, #00f5ff, #a855f7);
+        border: none;
+        color: #000;
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 10px 22px;
+        box-shadow: 0 0 25px rgba(0,245,255,.5);
+        transition: .3s;
+    }
+
+        .neon-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 35px rgba(168,85,247,.9);
+        }
+
+    .btn-outline {
+        border: 1px solid rgba(255,255,255,.2);
+        color: #9ca3af;
+        background: transparent;
+        border-radius: 10px;
+        padding: 8px 14px;
+    }
+
+    /* TABLE */
+    table {
+        color: #e5e7eb;
+    }
+    table tr{
+        color:white;
+    }
+
+        table tr:hover {
+            background: rgba(0,245,255,.08);
+        }
+
+    /* SLIDE PANEL */
+    .slide-panel {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 360px;
+        height: 100%;
+        background: #111827;
+        border-left: 1px solid rgba(0,245,255,.2);
+        box-shadow: -10px 0 40px rgba(0,245,255,.15);
+        transform: translateX(100%);
+        transition: transform .4s ease;
+        z-index: 1050;
+        padding: 24px;
+    }
+
+        .slide-panel.active {
+            transform: translateX(0);
+        }
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .form-control {
+        background: #0b0f1a;
+        border: 1px solid rgba(168,85,247,.35);
+        color: #fff;
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+        .form-control:focus {
+            border-color: #00f5ff;
+            box-shadow: 0 0 12px rgba(0,245,255,.5);
+            background: #0b0f1a;
+        }
+
+    /* OVERLAY */
+    .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.6);
+        opacity: 0;
+        visibility: hidden;
+        transition: .3s;
+        z-index: 1040;
+    }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+</style>
+
+<div class="container mt-5 mb-5">
+
+    <div class="card neon-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="neon-title mb-0">
+                <i class="bi bi-tags-fill me-2"></i> Markalar
+            </h4>
+
+            <button class="neon-btn" onclick="openCreate()">
+                + Yeni Marka
+            </button>
+        </div>
+
+        <table class="table table-borderless align-middle">
+            <thead>
                 <tr>
-                    <td>@b.Id</td>
-                    <td>@b.Name</td>
-                    <td>
-                        <a href="/Brand/Edit/@b.Id" class="btn btn-primary btn-sm">Düzenle</a>
-                        <button class="btn btn-danger btn-sm" onclick="deleteBrand(@b.Id)">Sil</button>
-                    </td>
+                    <th>#</th>
+                    <th>Marka Adı</th>
+                    <th class="text-end">İşlem</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var b in Model)
+                {
+                    <tr>
+                        <td>@b.Id</td>
+                        <td>@b.Name</td>
+                        <td class="text-end">
+                            <button class="btn btn-warning btn-sm"
+                                    onclick="openEdit(@b.Id,'@b.Name')">
+                                Düzenle
+                            </button>
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="deleteBrand(@b.Id)">
+                                Sil
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+
+<!-- SLIDE PANEL -->
+<div class="slide-panel" id="slidePanel">
+
+    <div class="panel-header">
+        <h5 class="neon-title" id="panelTitle">Yeni Marka Ekle</h5>
+        <button class="btn-outline" onclick="closePanel()">✕</button>
+    </div>
+
+    <form id="brandForm" method="post" action="/Brand/Create">
+
+        <input type="hidden" name="Id" id="brandId" />
+
+        <div class="mb-3">
+            <label class="form-label text-light">Marka Adı</label>
+            <input name="Name" id="brandName" class="form-control" />
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="button" class="btn-outline" onclick="closePanel()">
+                İptal
+            </button>
+            <button class="neon-btn">
+                Kaydet
+            </button>
+        </div>
+    </form>
 </div>
 
 <script>
+    const panel = document.getElementById("slidePanel");
+    const overlay = document.getElementById("overlay");
+
+    function openCreate() {
+        document.getElementById("panelTitle").innerText = "Yeni Marka Ekle";
+        document.getElementById("brandId").value = "";
+        document.getElementById("brandName").value = "";
+        document.getElementById("brandForm").action = "/Brand/Create";
+        openPanel();
+    }
+
+    function openEdit(id, name) {
+        document.getElementById("panelTitle").innerText = "Markayı Düzenle";
+        document.getElementById("brandId").value = id;
+        document.getElementById("brandName").value = name;
+        document.getElementById("brandForm").action = "/Brand/Edit";
+        openPanel();
+    }
+
+    function openPanel() {
+        panel.classList.add("active");
+        overlay.classList.add("active");
+    }
+
+    function closePanel() {
+        panel.classList.remove("active");
+        overlay.classList.remove("active");
+    }
+
     function deleteBrand(id) {
         if (confirm("Silmek istediğine emin misin?")) {
-            fetch('/Brand/Delete/' + id, {
-                method: 'POST'
-            }).then(() => location.reload());
+            fetch('/Brand/Delete/' + id, { method: 'POST' })
+                .then(() => location.reload());
         }
     }
 </script>

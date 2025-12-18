@@ -1,131 +1,109 @@
 ﻿@model AracKiralamaPortal.ViewModels.RegisterViewModel
-<div style="width:30%; justify-self:center;">
-<h2>Kayıt Ol</h2>
 
-<form asp-action="Register" method="post" id="registerForm">
+<link href="~/css/site.css" rel="stylesheet" />
+<link href="~/css/sign.css" rel="stylesheet" />
 
-    <div class="form-group">
-        <label>Kullanıcı Adı</label>
-        <input asp-for="Username" class="form-control" />
+<div class="login-page">
+    <div class="login-card glass-card" id="card">
+        <h2 class="login-title">Kayıt Ol</h2>
+
+        <form id="registerForm" asp-action="Register" method="post">
+
+            <div class="input-group">
+                <input asp-for="Username" class="input-field" placeholder="Kullanıcı Adı" />
+            </div>
+
+            <div class="input-group">
+                <input asp-for="Email" class="input-field" placeholder="Email" />
+            </div>
+
+            <div class="input-group password-group">
+                <input asp-for="Password" type="password" class="input-field" id="passwordInput" placeholder="Şifre" />
+                <span class="toggle-password" onclick="togglePwd('passwordInput', this)">
+                    <i class="fa-solid fa-eye"></i>
+                </span>
+                <div class="strength-bar" id="strengthBar"></div>
+                <div class="password-info" id="passwordInfo">
+                    <ul>
+                        <li id="u">1 Büyük harf</li>
+                        <li id="l">1 Küçük harf</li>
+                        <li id="d">1 Rakam</li>
+                        <li id="s">1 Özel karakter</li>
+                        <li id="len">Min 6 karakter</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="input-group password-group">
+                <input asp-for="ConfirmPassword" type="password" class="input-field" id="confirmInput" placeholder="Şifre Tekrar" />
+                <span class="toggle-password" onclick="togglePwd('confirmInput', this)">
+                    <i class="fa-solid fa-eye"></i>
+                </span>
+            </div>
+
+            <button type="submit" class="btn-glass" id="submitBtn" disabled>Kayıt Ol</button>
+
+        </form>
     </div>
-
-    <div class="form-group">
-        <label>Email</label>
-        <input asp-for="Email" class="form-control" type="email" />
-    </div>
-
-    <!-- Şifre Alanı -->
-    <div class="form-group position-relative">
-        <label>Şifre</label>
-        <input asp-for="Password" class="form-control" type="password" id="passwordInput" />
-
-        <!-- Göz ikonu -->
-        <span id="togglePassword" style="position:absolute; right:10px; top:40px; cursor:pointer;">
-            <i class="fas fa-eye"></i>
-        </span>
-    </div>
-
-    <!-- Şifre Kuralları -->
-    <ul style="display:none; text-decoration:none;" class="mt-2" id="passwordRules">
-        <li id="ruleUpper">En az 1 büyük harf</li>
-        <li id="ruleLower">En az 1 küçük harf</li>
-        <li id="ruleDigit">En az 1 rakam</li>
-        <li id="ruleSpecial">En az 1 özel karakter</li>
-        <li id="ruleLength">En az 6 karakter</li>
-    </ul>
-
-    <!-- Confirm Password -->
-    <div class="form-group position-relative mt-3">
-        <label>Şifre Tekrar</label>
-        <input asp-for="ConfirmPassword" type="password" class="form-control" id="confirmInput" />
-
-        <span id="toggleConfirm" style="position:absolute; right:10px; top:40px; cursor:pointer;">
-            <i class="fas fa-eye"></i>
-        </span>
-    </div>
-
-    <span id="passwordError" class="text-danger"></span>
-
-    <button class="btn btn-primary mt-3" type="submit">Kayıt Ol</button>
-</form>
 </div>
 
 @section Scripts {
     <script>
-        const passwordInput = document.getElementById("passwordInput");
-        const confirmInput = document.getElementById("confirmInput");
+        const pwd = document.getElementById("passwordInput");
+        const info = document.getElementById("passwordInfo");
+        const bar = document.getElementById("strengthBar");
+        const btn = document.getElementById("submitBtn");
+        const card = document.getElementById("card");
 
-        const passwordRules = document.getElementById("passwordRules");
-        const passwordError = document.getElementById("passwordError");
+        pwd.addEventListener("focus", () => info.style.display = "block");
+        pwd.addEventListener("blur", () => info.style.display = "none");
 
-        const ruleUpper = document.getElementById("ruleUpper");
-        const ruleLower = document.getElementById("ruleLower");
-        const ruleDigit = document.getElementById("ruleDigit");
-        const ruleSpecial = document.getElementById("ruleSpecial");
-        const ruleLength = document.getElementById("ruleLength");
+        pwd.addEventListener("input", () => {
+            const v = pwd.value;
+            let score = 0;
 
-        function validatePassword() {
-            const pwd = passwordInput.value;
+            const rules = {
+                u: /[A-Z]/.test(v),
+                l: /[a-z]/.test(v),
+                d: /[0-9]/.test(v),
+                s: /[^A-Za-z0-9]/.test(v),
+                len: v.length >= 6
+            };
 
-            const upper = /[A-Z]/.test(pwd);
-            const lower = /[a-z]/.test(pwd);
-            const digit = /[0-9]/.test(pwd);
-            const special = /[^A-Za-z0-9]/.test(pwd);
-            const length = pwd.length >= 6;
+            Object.keys(rules).forEach(k => {
+                document.getElementById(k).style.color = rules[k] ? "#00f5ff" : "#ff3860";
+                if (rules[k]) score++;
+            });
 
-            ruleUpper.style.color = upper ? "green" : "red";
-            ruleLower.style.color = lower ? "green" : "red";
-            ruleDigit.style.color = digit ? "green" : "red";
-            ruleSpecial.style.color = special ? "green" : "red";
-            ruleLength.style.color = length ? "green" : "red";
+            bar.style.width = (score * 20) + "%";
+            bar.style.background =
+                score < 3 ? "#ff3860" :
+                score < 5 ? "#ffa500" : "#00f5ff";
 
-            const valid = upper && lower && digit && special && length;
+            btn.disabled = score < 5;
+        });
 
-            passwordRules.style.display = valid ? "none" : "block";
-
-            return valid;
-        }
-
-        passwordInput.addEventListener("input", validatePassword);
-
-        // Form Submit Kontrolü
-        document.getElementById("registerForm").addEventListener("submit", function (e) {
-            passwordError.innerText = "";
-
-            if (!validatePassword()) {
+        document.getElementById("registerForm").addEventListener("submit", e => {
+            if (btn.disabled) {
                 e.preventDefault();
-                passwordError.innerText = "Şifre kurallara uygun değil!";
+                card.classList.add("shake");
+                setTimeout(() => card.classList.remove("shake"), 300);
                 return;
             }
-
-            if (passwordInput.value !== confirmInput.value) {
-                e.preventDefault();
-                passwordError.innerText = "Şifreler eşleşmiyor!";
-            }
+            btn.innerHTML = "Kaydediliyor...";
+            btn.disabled = true;
         });
 
-        // Şifre Göster/Gizle
-        document.getElementById("togglePassword").addEventListener("click", function () {
-            const icon = this.querySelector("i");
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
+        function togglePwd(id, el) {
+            const input = document.getElementById(id);
+            const icon = el.querySelector("i");
+            if (input.type === "password") {
+                input.type = "text";
                 icon.classList.replace("fa-eye", "fa-eye-slash");
             } else {
-                passwordInput.type = "password";
+                input.type = "password";
                 icon.classList.replace("fa-eye-slash", "fa-eye");
             }
-        });
-
-        // Confirm Şifre Göster/Gizle
-        document.getElementById("toggleConfirm").addEventListener("click", function () {
-            const icon = this.querySelector("i");
-            if (confirmInput.type === "password") {
-                confirmInput.type = "text";
-                icon.classList.replace("fa-eye", "fa-eye-slash");
-            } else {
-                confirmInput.type = "password";
-                icon.classList.replace("fa-eye-slash", "fa-eye");
-            }
-        });
+        }
     </script>
 }
