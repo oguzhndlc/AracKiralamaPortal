@@ -1,19 +1,20 @@
 ﻿using AracKiralamaPortal.Models;
 using AracKiralamaPortal.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace AracKiralamaPortal.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Employee")]
     public class CarController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
 
-        public CarController(IUnitOfWork unitOfWork)
+        public CarController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
         }

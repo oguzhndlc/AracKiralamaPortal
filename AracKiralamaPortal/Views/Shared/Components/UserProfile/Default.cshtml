@@ -1,0 +1,15 @@
+﻿@model ApplicationUser
+
+@if (Model != null)
+{
+    <span>@Model.Name</span>
+    <img src="~/images/profiles/@Model.ProfileURL"
+         class="rounded-circle"
+         style="width:36px;height:36px;object-fit:cover;margin-left:8px;" />
+    @if (User.Identity.IsAuthenticated)
+    {
+        <input type="hidden" id="currentUserId" value="@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value" />
+        <input type="hidden" id="currentUserName" value="@User.Identity.Name" />
+    }
+    
+}

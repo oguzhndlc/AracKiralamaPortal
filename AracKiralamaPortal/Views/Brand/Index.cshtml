@@ -50,17 +50,34 @@
         padding: 8px 14px;
     }
 
+    /* SEARCH */
+    .search-input {
+        background: #0b0f1a;
+        border: 1px solid rgba(0,245,255,.35);
+        color: #fff;
+        border-radius: 12px;
+        padding: 10px 14px;
+        width: 260px;
+    }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #00f5ff;
+            box-shadow: 0 0 12px rgba(0,245,255,.5);
+        }
+
     /* TABLE */
     table {
         color: #e5e7eb;
     }
-    table tr{
-        color:white;
-    }
 
-        table tr:hover {
-            background: rgba(0,245,255,.08);
+        table tr {
+            color: white;
         }
+
+            table tr:hover {
+                background: rgba(0,245,255,.08);
+            }
 
     /* SLIDE PANEL */
     .slide-panel {
@@ -123,17 +140,25 @@
 <div class="container mt-5 mb-5">
 
     <div class="card neon-card p-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <!-- TITLE + SEARCH + BUTTON -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
             <h4 class="neon-title mb-0">
                 <i class="bi bi-tags-fill me-2"></i> Markalar
             </h4>
+
+            <input type="text"
+                   id="brandSearch"
+                   class="search-input"
+                   placeholder="Marka ara..."
+                   onkeyup="filterBrands()" />
 
             <button class="neon-btn" onclick="openCreate()">
                 + Yeni Marka
             </button>
         </div>
 
-        <table class="table table-borderless align-middle">
+        <table class="table table-borderless align-middle" id="brandTable">
             <thead>
                 <tr>
                     <th>#</th>
@@ -146,7 +171,7 @@
                 {
                     <tr>
                         <td>@b.Id</td>
-                        <td>@b.Name</td>
+                        <td class="brand-name">@b.Name</td>
                         <td class="text-end">
                             <button class="btn btn-warning btn-sm"
                                     onclick="openEdit(@b.Id,'@b.Name')">
@@ -161,6 +186,7 @@
                 }
             </tbody>
         </table>
+
     </div>
 </div>
 
@@ -185,12 +211,8 @@
         </div>
 
         <div class="d-flex justify-content-end gap-2 mt-4">
-            <button type="button" class="btn-outline" onclick="closePanel()">
-                İptal
-            </button>
-            <button class="neon-btn">
-                Kaydet
-            </button>
+            <button type="button" class="btn-outline" onclick="closePanel()">İptal</button>
+            <button class="neon-btn">Kaydet</button>
         </div>
     </form>
 </div>
@@ -230,5 +252,22 @@
             fetch('/Brand/Delete/' + id, { method: 'POST' })
                 .then(() => location.reload());
         }
+    }
+
+    /* 🔍 TÜRKÇE UYUMLU ARAMA */
+    function filterBrands() {
+        const input = document.getElementById("brandSearch")
+            .value
+            .toLocaleLowerCase("tr-TR");
+
+        const rows = document.querySelectorAll("#brandTable tbody tr");
+
+        rows.forEach(row => {
+            const brand = row.querySelector(".brand-name")
+                .innerText
+                .toLocaleLowerCase("tr-TR");
+
+            row.style.display = brand.includes(input) ? "" : "none";
+        });
     }
 </script>

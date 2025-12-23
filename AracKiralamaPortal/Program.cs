@@ -1,10 +1,11 @@
 ﻿using AracKiralamaPortal.Data;
+using AracKiralamaPortal.Hubs;
+using AracKiralamaPortal.Models;
 using AracKiralamaPortal.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using AracKiralamaPortal.Models;
 using System.Globalization;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 var culture = new CultureInfo("tr-TR");
 CultureInfo.DefaultThreadCurrentCulture = culture;
 CultureInfo.DefaultThreadCurrentUICulture = culture;
-
 
 // JSON Site Settings
 builder.Services.AddSingleton<SiteSettingsService>();
@@ -39,9 +39,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Home/Index";
 });
 
+// SignalR servisini ekleyin
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
-
+// SeedRoles ve SeedAdmin metotları (mevcut kodunuzun devamı)
 
 async Task SeedRoles(IServiceProvider services)
 {
@@ -52,6 +55,9 @@ async Task SeedRoles(IServiceProvider services)
 
     if (!await roleManager.RoleExistsAsync("User"))
         await roleManager.CreateAsync(new IdentityRole("User"));
+
+    if (!await roleManager.RoleExistsAsync("Employee")) 
+        await roleManager.CreateAsync(new IdentityRole("Employee"));
 }
 
 async Task SeedAdmin(IServiceProvider services)
@@ -64,6 +70,7 @@ async Task SeedAdmin(IServiceProvider services)
 
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
+    // Admin kullanıcı yoksa oluştur
     if (adminUser == null)
     {
         adminUser = new ApplicationUser
@@ -75,14 +82,19 @@ async Task SeedAdmin(IServiceProvider services)
 
         var result = await userManager.CreateAsync(adminUser, adminPassword);
 
-        if (result.Succeeded)
+        if (!result.Succeeded)
         {
-            await userManager.AddToRoleAsync(adminUser, "Admin");
+            return; // oluşturulamazsa devam etme
         }
     }
+
+    // 🔒 KRİTİK KISIM
+    // Program HER AÇILDIĞINDA admin rolünü garanti et
+    if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
+    {
+        await userManager.AddToRoleAsync(adminUser, "Admin");
+    }
 }
-
-
 
 
 using (var scope = app.Services.CreateScope())
@@ -90,9 +102,6 @@ using (var scope = app.Services.CreateScope())
     await SeedRoles(scope.ServiceProvider);
     await SeedAdmin(scope.ServiceProvider);
 }
-
-
-
 
 // ERROR HANDLER
 if (!app.Environment.IsDevelopment())
@@ -110,9 +119,11 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ROUTING
+app.MapHub<ChatHub>("/chathub");
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
 
 app.Run();

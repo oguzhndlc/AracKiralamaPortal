@@ -1,0 +1,410 @@
+﻿@using AracKiralamaPortal.ViewModels
+@using Microsoft.AspNetCore.Identity
+@using AracKiralamaPortal.Models
+
+@model ProfileViewModel
+@inject UserManager<ApplicationUser> UserManager
+
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Profil";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    /* ===== PROFILE CARD (BBBootstrap uyarlama) ===== */
+
+    .profile-card {
+        border-radius: 8px;
+        box-shadow: 0 1px 20px rgba(69,90,100,.08);
+        overflow: visible;
+    }
+
+    /* Sol alan */
+    .profile-left {
+        background: linear-gradient(200deg, #56DCB6, #56C0DC, #567CDC);
+        color: #fff;
+        padding: 30px 20px;
+        text-align: center;
+    }
+
+        .profile-left h6 {
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        .profile-left p {
+            font-size: 14px;
+            opacity: .9;
+        }
+
+    /* Profil foto */
+    .profile-photo-wrapper {
+        position: relative;
+        width: 200px;
+        margin: auto;
+        cursor: pointer;
+    }
+
+        .profile-photo-wrapper img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid rgba(255,255,255,.4);
+        }
+
+    .photo-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,.55);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        opacity: 0;
+        transition: .3s;
+        font-size: 14px;
+    }
+
+    .profile-photo-wrapper:hover .photo-overlay {
+        opacity: 1;
+    }
+
+    /* Sağ alan */
+    .profile-right {
+        padding: 30px;
+        color:black;
+    }
+
+        .profile-right .row{
+            margin-top:50px;
+           margin-bottom:50px;
+        }
+
+        .profile-right .col{
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+
+        .profile-right h6 {
+            font-size: 30px;
+            font-weight: 700;
+        }
+
+        .profile-right p {
+            font-size:20px;
+            font-weight:600;
+        }
+
+        .profile-right .section-title {
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+        }
+
+    /* Editable */
+    .editable {
+        cursor: pointer;
+        border-radius: 6px;
+        padding: 4px 6px;
+        font-size:20px;
+        width: fit-content;
+    }
+
+        .editable:hover {
+            background: rgba(13,110,253,.08);
+        }
+
+    .text-muted {
+        color: #919aa3 !important;
+    }
+
+    .toast-center-wrapper {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        pointer-events: none;
+        display: none;
+    }
+
+        .toast-center-wrapper.show {
+            display: block;
+        }
+
+
+        .toast-center-wrapper .toast {
+            pointer-events: auto;
+            min-width: 600px;
+        }
+</style>
+<div class="container-fluid d-flex justify-content-center mt-5">
+    <div class="col-xl-8 col-md-12">
+        <div class="card profile-card">
+            <div class="row g-0">
+
+                <!-- SOL TARAF -->
+                <div class="col-md-4 profile-left">
+
+                    <div class="profile-photo-wrapper"
+                         id="profilePhoto"
+                         data-current="@Model.ProfileURL">
+
+                        <img id="profileImage"
+                             src="@(string.IsNullOrEmpty(Model.ProfileURL)
+                                                             ? Url.Content("~/images/profiles/default.png")
+                                                             : Url.Content("~/images/profiles/" + Model.ProfileURL))" />
+
+                        <div class="photo-overlay">Değiştir</div>
+                    </div>
+
+                    <h6>@Model.Name @Model.Surname</h6>
+                    <p>@Model.Username</p>
+                </div>
+
+                <!-- SAĞ TARAF -->
+                <div class="col-md-8 profile-right">
+
+                    <h6 class="section-title">Bilgiler</h6>
+                    <p class="text-danger" style="font-size:15px !important;">Bilgilerinizi değiştirmek isterseniz üzerine tıklayarak değiştirebilirsiniz. </p>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <p class="mb-1 fw-bold">İsim</p>    
+                            <div class="editable"
+                                 data-field="Name"
+                                 data-value="@Model.Name">
+                                @Model.Name
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <p class="mb-1 fw-bold">Soyisim</p>
+                            <div class="editable"
+                                 data-field="Surname"
+                                 data-value="@Model.Surname">
+                                @Model.Surname
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <p class="mb-1 fw-bold">Kullanıcı Adı</p>
+                            <div class="editable"
+                                 data-field="Username"
+                                 data-value="@Model.Username">
+                                @Model.Username
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <p class="mb-1 fw-bold">Email</p>
+                            <div class="editable"
+                                 data-field="Email"
+                                 data-value="@Model.Email">
+                                @Model.Email
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p class="mb-1 fw-bold">Telefon</p>
+                            <div class="editable"
+                                 data-field="PhoneNumber"
+                                 data-value="@Model.PhoneNumber">
+                                @Model.PhoneNumber
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="toast-center-wrapper">
+    <!-- PROFİL BİLGİ TOAST -->
+    <div id="editToast"
+         class="toast mb-2"
+         data-bs-autohide="false">
+
+        <div class="toast-header">
+            <strong class="me-auto" id="toastTitle">Bilgi Düzenle</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+
+        <div class="toast-body">
+            <input type="text" id="editInput" class="form-control mb-2" />
+            <button class="btn btn-primary w-100" id="saveProfileBtn">
+                Kaydet
+            </button>
+        </div>
+    </div>
+
+    <!-- PROFİL FOTO TOAST -->
+    <div id="photoToast"
+         class="toast"
+         data-bs-autohide="false">
+
+        <div class="toast-header">
+            <strong class="me-auto">Profil Fotoğrafı</strong>
+            <button class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+
+        <div class="toast-body text-center">
+            <img id="photoPreview"
+                 class="rounded-circle mb-3"
+                 style="width:100px;height:100px;object-fit:cover;" />
+
+            <input type="file"
+                   id="photoInput"
+                   class="form-control mb-2"
+                   accept="image/*" />
+
+            <button class="btn btn-primary w-100" id="savePhotoBtn">
+                Kaydet
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const wrapper = document.querySelector(".toast-center-wrapper");
+
+        /* ==========================
+           PROFİL FOTOĞRAF TOAST
+        ========================== */
+
+        const photoWrapper = document.getElementById("profilePhoto");
+        const photoToastEl = document.getElementById("photoToast");
+
+        let photoToast = null;
+
+        if (photoWrapper && photoToastEl) {
+
+            photoToast = new bootstrap.Toast(photoToastEl, {
+                autohide: false
+            });
+
+            photoWrapper.addEventListener("click", function () {
+                const current = this.dataset.current;
+
+                document.getElementById("photoPreview").src =
+                    "/images/profiles/" + current;
+
+                wrapper.classList.add("show");   // 👈 wrapper aktif
+                photoToast.show();
+            });
+
+            document.getElementById("photoInput")
+                .addEventListener("change", function () {
+                    const file = this.files[0];
+                    if (file) {
+                        document.getElementById("photoPreview").src =
+                            URL.createObjectURL(file);
+                    }
+                });
+
+            document.getElementById("savePhotoBtn")
+                .addEventListener("click", function () {
+
+                    const file = document.getElementById("photoInput").files[0];
+                    if (!file) return;
+
+                    const formData = new FormData();
+                    formData.append("photo", file);
+
+                    fetch("/Account/UpdatePhoto", {
+                        method: "POST",
+                        body: formData
+                    })
+                    .then(r => r.json())
+                    .then(res => {
+                        if (res.success) {
+                            const img = photoWrapper.querySelector("img");
+                            img.src = res.newPath + "?t=" + new Date().getTime();
+                            photoWrapper.dataset.current = res.fileName;
+                            photoToast.hide();
+                        }
+                    });
+                });
+
+
+            photoToastEl.addEventListener("hidden.bs.toast", () => {
+                wrapper.classList.remove("show");
+            });
+        }
+
+        /*PROFİL BİLGİ TOAST*/
+
+        let selectedField = "";
+        let selectedTd = null;
+
+        const editToastEl = document.getElementById("editToast");
+        if (!editToastEl) return;
+
+        const editToast = new bootstrap.Toast(editToastEl, {
+            autohide: false
+        });
+
+        document.querySelectorAll(".editable").forEach(td => {
+            td.addEventListener("click", function () {
+                selectedField = this.dataset.field;
+                selectedTd = this;
+
+                document.getElementById("editInput").value = this.dataset.value;
+                document.getElementById("toastTitle").innerText =
+                    selectedField + " Düzenle";
+
+                wrapper.classList.add("show"); 
+                editToast.show();
+            });
+        });
+
+        document.getElementById("saveProfileBtn")
+            .addEventListener("click", function () {
+
+                const newValue = document.getElementById("editInput").value;
+
+                fetch("/Account/UpdateField", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "RequestVerificationToken":
+                            document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                    },
+                    body: JSON.stringify({
+                        field: selectedField,
+                        value: newValue
+                    })
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        selectedTd.innerText = newValue;
+                        selectedTd.dataset.value = newValue;
+                        editToast.hide();
+                    }
+                });
+            });
+
+        // 👇 BİLGİ TOAST KAPANINCA WRAPPER'I KAPAT
+        editToastEl.addEventListener("hidden.bs.toast", () => {
+            wrapper.classList.remove("show");
+        });
+
+    });
+</script>
+
+

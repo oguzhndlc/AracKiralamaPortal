@@ -1,5 +1,6 @@
 ﻿using AracKiralamaPortal.Data;
 using AracKiralamaPortal.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -11,7 +12,7 @@ namespace AracKiralamaPortal.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
+        public HomeController(UserManager<ApplicationUser> userManager,ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
             _context = context;
@@ -24,6 +25,11 @@ namespace AracKiralamaPortal.Controllers
                 .ToListAsync();
 
             return View(cars);
+        }
+
+        public IActionResult Chat()
+        {
+            return View();
         }
 
         public IActionResult Privacy()

@@ -1,16 +1,17 @@
 ﻿using AracKiralamaPortal.Models;
 using AracKiralamaPortal.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AracKiralamaPortal.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Employee")]
     public class BrandController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public BrandController(IUnitOfWork unitOfWork)
+        public BrandController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
         }

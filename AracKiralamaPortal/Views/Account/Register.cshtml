@@ -3,18 +3,29 @@
 <link href="~/css/site.css" rel="stylesheet" />
 <link href="~/css/sign.css" rel="stylesheet" />
 
-<div class="login-page">
+<div class="login-page register-page">
     <div class="login-card glass-card" id="card">
         <h2 class="login-title">Kayıt Ol</h2>
 
         <form id="registerForm" asp-action="Register" method="post">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <div class="input-group">
+                <input asp-for="Name" class="input-field" placeholder="İsim" />
+            </div>
+
+            <div class="input-group">
+                <input asp-for="Surname" class="input-field" placeholder="Soy İsim" />
+            </div>
 
             <div class="input-group">
                 <input asp-for="Username" class="input-field" placeholder="Kullanıcı Adı" />
+                <span asp-validation-for="Username" class="text-danger"></span>
             </div>
 
             <div class="input-group">
                 <input asp-for="Email" class="input-field" placeholder="Email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
             </div>
 
             <div class="input-group password-group">
@@ -22,7 +33,9 @@
                 <span class="toggle-password" onclick="togglePwd('passwordInput', this)">
                     <i class="fa-solid fa-eye"></i>
                 </span>
+
                 <div class="strength-bar" id="strengthBar"></div>
+
                 <div class="password-info" id="passwordInfo">
                     <ul>
                         <li id="u">1 Büyük harf</li>
@@ -42,12 +55,13 @@
             </div>
 
             <button type="submit" class="btn-glass" id="submitBtn" disabled>Kayıt Ol</button>
-
         </form>
     </div>
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
     <script>
         const pwd = document.getElementById("passwordInput");
         const info = document.getElementById("passwordInfo");
@@ -97,13 +111,9 @@
         function togglePwd(id, el) {
             const input = document.getElementById(id);
             const icon = el.querySelector("i");
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.replace("fa-eye", "fa-eye-slash");
-            } else {
-                input.type = "password";
-                icon.classList.replace("fa-eye-slash", "fa-eye");
-            }
+            input.type = input.type === "password" ? "text" : "password";
+            icon.classList.toggle("fa-eye");
+            icon.classList.toggle("fa-eye-slash");
         }
     </script>
 }

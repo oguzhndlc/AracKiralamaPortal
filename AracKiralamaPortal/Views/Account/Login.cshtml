@@ -3,19 +3,19 @@
 <link href="~/css/site.css" rel="stylesheet" />
 <link href="~/css/sign.css" rel="stylesheet" />
 
-<div class="login-page">
+<div class="login-page login-page-only">
     <div class="login-card glass-card">
         <h2 class="login-title">Giriş Yap</h2>
 
         <form asp-action="Login" method="post" id="loginForm">
             <div class="input-group">
                 <label>Kullanıcı Adı veya Email</label>
-                <input asp-for="UsernameOrEmail" class="input-field" placeholder="Kullanıcı adı veya email" />
+                <input asp-for="UsernameOrEmail" class="input-field" />
             </div>
 
             <div class="input-group password-group">
                 <label>Şifre</label>
-                <input asp-for="Password" type="password" class="input-field" id="loginPassword" placeholder="Şifre" />
+                <input asp-for="Password" type="password" class="input-field" id="loginPassword" />
                 <span class="toggle-password" id="toggleLoginPassword">
                     <i class="fa-solid fa-eye"></i>
                 </span>
@@ -41,8 +41,8 @@
         const togglePwd = document.getElementById("toggleLoginPassword");
 
         togglePwd.addEventListener("click", function () {
-            const type = loginPwd.getAttribute("type") === "password" ? "text" : "password";
-            loginPwd.setAttribute("type", type);
+            const type = loginPwd.type === "password" ? "text" : "password";
+            loginPwd.type = type;
             this.innerHTML = type === "password"
                 ? '<i class="fa-solid fa-eye"></i>'
                 : '<i class="fa-solid fa-eye-slash"></i>';

@@ -4,6 +4,8 @@ namespace AracKiralamaPortal.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        // gelecekte profile özellikleri eklersin (Ad, Soyad vb.)
+        public string? Name { get; set; }
+        public string? Surname { get; set; }
+        public string? ProfileURL { get; set; }
     }
 }

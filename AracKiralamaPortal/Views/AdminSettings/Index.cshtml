@@ -4,7 +4,8 @@
     ViewData["Title"] = "Site Ayarları";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-
+@if (User.IsInRole("Admin"))
+{
 <style>
     body {
         background: #0b0f1a;
@@ -112,3 +113,15 @@
         <button type="submit">Kaydet</button>
     </form>
 </div>
+}
+else
+{
+    <div class="container mt-5 text-center">
+        <h1 class="text-danger">⛔ Yetkisiz Erişim</h1>
+        <p>Bu sayfaya erişim yetkiniz yok.</p>
+
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-primary mt-3">
+            Ana Sayfaya Dön
+        </a>
+    </div>
+}

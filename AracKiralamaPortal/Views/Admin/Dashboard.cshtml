@@ -93,18 +93,22 @@
         </div>
     </div>
 
-    <!-- Toplam Kullanıcı -->
-    <div class="dashboard-col">
-        <div class="neon-card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <div class="neon-title">Toplam Kullanıcı</div>
-                    <div class="neon-value">@ViewBag.TotalUsers</div>
-                </div>
-                <div>
-                    <i class="fas fa-user neon-icon"></i>
+    @if (User.IsInRole("Admin"))
+    {
+        <!-- Toplam Kullanıcı -->
+        <div class="dashboard-col">
+            <div class="neon-card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div class="neon-title">Toplam Kullanıcı</div>
+                        <div class="neon-value">@ViewBag.TotalUsers</div>
+                    </div>
+                    <div>
+                        <i class="fas fa-user neon-icon"></i>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    }
+    
 </div>

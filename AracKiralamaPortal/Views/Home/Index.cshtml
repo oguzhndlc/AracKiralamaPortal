@@ -1,6 +1,4 @@
-﻿@inject SiteSettingsService SettingsService
-@{
-    var settings = SettingsService.GetSettings();
+﻿@{
     ViewData["Title"] = "Ana Sayfa";
 }
 @model List<AracKiralamaPortal.Models.Car>
@@ -39,7 +37,7 @@
                         <div class="car-price">
                             @car.Price ₺ <span>/gün</span>
                         </div>
-                        <a href="#" class="rent-btn">Hemen Kirala</a>
+                        <a asp-controller="Home" asp-action="Chat" class="rent-btn">Hemen Kirala</a>
                     </div>
 
                 </div>

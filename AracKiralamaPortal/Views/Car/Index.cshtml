@@ -104,6 +104,24 @@
         padding: 6px 10px;
         font-size: 13px;
     }
+
+    .neon-input {
+        background: #0f172a;
+        border: 1px solid rgba(0,245,255,.3);
+        color: #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(0,245,255,.15);
+        padding:10px;
+    }
+
+        .neon-input:focus {
+            outline: none;
+            border-color: #00f5ff;
+            box-shadow: 0 0 25px rgba(0,245,255,.6);
+            background: #020617;
+            color: white;
+        }
+
 </style>
 
 <div class="container mt-5 mb-5">
@@ -118,6 +136,35 @@
             <a href="/Car/Create" class="neon-btn">
                 + Yeni Araç
             </a>
+        </div>
+        <!-- Filtre -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-4">
+                <input type="text"
+                       id="filterModel"
+                       class="form-control neon-input"
+                       placeholder="🔍 Model ara">
+            </div>
+
+            <div class="col-md-4">
+                <select id="filterBrand" class="form-select neon-input">
+                    <option value="">Tüm Markalar</option>
+                    @foreach (var brand in Model.Select(x => x.Brand.Name).Distinct())
+                    {
+                        <option value="@brand">@brand</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <select id="filterStatus" class="form-select neon-input">
+                    <option value="">Tüm Durumlar</option>
+                    <option value="Müsait">Müsait</option>
+                    <option value="Müsait Değil">Müsait Değil</option>
+                </select>
+            </div>
+
         </div>
 
         <table class="table table-borderless align-middle">
@@ -223,4 +270,39 @@
             }
         });
     }
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+        function normalizeTR(text) {
+            return text
+                .toLocaleLowerCase("tr-TR")
+                .trim();
+        }
+
+        function applyFilters() {
+
+            const modelFilter  = normalizeTR($("#filterModel").val());
+            const brandFilter  = normalizeTR($("#filterBrand").val());
+            const statusFilter = normalizeTR($("#filterStatus").val());
+
+            $("tbody tr").each(function () {
+
+                const tds = $(this).find("td");
+
+                const model  = normalizeTR(tds.eq(1).text());
+                const brand  = normalizeTR(tds.eq(4).text());
+                const status = normalizeTR(tds.eq(5).find(".status-badge").text());
+
+                const matchModel  = modelFilter === "" || model.includes(modelFilter);
+                const matchBrand  = brandFilter === "" || brand === brandFilter;
+                const matchStatus = statusFilter === "" || status === statusFilter;
+
+                $(this).toggle(matchModel && matchBrand && matchStatus);
+            });
+        }
+
+        $("#filterModel").on("input", applyFilters);
+        $("#filterBrand").on("change", applyFilters);
+        $("#filterStatus").on("change", applyFilters);
+    });
 </script>

@@ -1,208 +1,347 @@
-﻿@model List<ApplicationUser>
+﻿    @model List<ApplicationUser>
 
-@using Microsoft.AspNetCore.Identity
-@using AracKiralamaPortal.Models
-@inject UserManager<ApplicationUser> UserManager
+    @using Microsoft.AspNetCore.Identity
+    @using AracKiralamaPortal.Models
+    @inject UserManager<ApplicationUser> UserManager
 
-@{
-    ViewData["Title"] = "Kullanıcı Yönetimi";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
-}
-
-<style>
-    body {
-        background: #0b0f1a;
-        font-family: 'Segoe UI', sans-serif;
+    @{
+        ViewData["Title"] = "Kullanıcı Yönetimi";
+        Layout = "~/Views/Shared/_AdminLayout.cshtml";
     }
-
-    /* CARD */
-    .neon-card {
-        background: #111827;
-        border-radius: 20px;
-        border: 2px solid rgba(0, 245, 255, 0.2);
-        box-shadow: 0 0 40px rgba(0, 245, 255, 0.1);
-        padding: 30px;
-    }
-
-    .neon-title {
-        color: #00f5ff;
-        font-weight: 700;
-        text-shadow: 0 0 10px #00f5ff, 0 0 20px rgba(0,245,255,.4);
-        margin-bottom: 20px;
-        font-size: 1.8rem;
-    }
-
-    /* TABLE */
-    table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0 12px;
-        color: #e5e7eb;
-    }
-
-        table thead th {
-            color: #9ca3af;
-            font-weight: 600;
-            font-size: 14px;
-            text-align: left;
-            padding: 10px 20px;
+    @if (User.IsInRole("Admin"))
+    {
+    <style>
+        body {
+            background: #0b0f1a;
+            font-family: 'Segoe UI', sans-serif;
         }
 
-        table tbody tr {
-            color:white;
-            background: #1f2937;
-            transition: all 0.3s ease;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,245,255,0.1);
-            cursor: default;
+        .neon-card {
+            background: #111827;
+            border-radius: 20px;
+            border: 2px solid rgba(0,245,255,.2);
+            box-shadow: 0 0 40px rgba(0,245,255,.1);
+            padding: 30px;
         }
 
-            table tbody tr:hover {
-                background: #0f172a;
-                transform: scale(1.01);
-                box-shadow: 0 0 20px rgba(0,245,255,0.4);
+        .neon-title {
+            color: #00f5ff;
+            font-weight: 700;
+            text-shadow: 0 0 10px #00f5ff;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 12px;
+            color: #e5e7eb;
+        }
+
+            table tbody tr {
+                background: #1f2937;
+                border-radius: 12px;
+                transition: .3s;
             }
 
-        table td {
-            padding: 12px 20px;
-            vertical-align: middle;
-        }
-
-    /* BADGE */
-    .role-badge {
-        font-size: 12px;
-        padding: 6px 14px;
-        border-radius: 50px;
-        color: #fff;
-        margin-right: 6px;
-        display: inline-block;
-        background: linear-gradient(135deg, #3b82f6, #06b6d4);
-        text-shadow: 0 0 6px rgba(0,245,255,0.5);
-        box-shadow: 0 0 8px rgba(0,245,255,0.4);
-        transition: transform 0.2s ease;
-    }
-
-        .role-badge:hover {
-            transform: scale(1.1);
-        }
-
-    /* BUTTONS */
-    .action-btn {
-        border-radius: 999px;
-        padding: 8px 20px;
-        font-size: 13px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 0 8px rgba(0,245,255,0.2);
-    }
-
-        .action-btn:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 0 20px rgba(0,245,255,0.5);
-        }
-
-    .btn-admin {
-        background: linear-gradient(135deg, #22c55e, #16a34a);
-        color: #000;
-        border: none;
-    }
-
-    .btn-remove {
-        background: linear-gradient(135deg, #ef4444, #b91c1c);
-        color: #fff;
-        border: none;
-    }
-</style>
-
-<div class="container mt-5 mb-5">
-
-    <div class="neon-card">
-
-        <h4 class="neon-title">
-            <i class="bi bi-people-fill me-2"></i> Kullanıcılar
-        </h4>
-
-        <table class="table table-borderless align-middle">
-            <thead>
-                <tr>
-                    <th>Kullanıcı Adı</th>
-                    <th>Email</th>
-                    <th>Roller</th>
-                    <th class="text-end">İşlem</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @foreach (var user in Model)
-                {
-                    var roles = await UserManager.GetRolesAsync(user);
-
-                    <tr>
-                        <td>@user.UserName</td>
-                        <td>@user.Email</td>
-
-                        <td id="roles_@user.Id">
-                            @foreach (var role in roles)
-                            {
-                                <span class="role-badge">@role</span>
-                            }
-                        </td>
-
-                        <td class="text-end" id="action_@user.Id">
-                            <button class="action-btn @(roles.Contains("Admin") ? "btn-remove" : "btn-admin")"
-                                    onclick="toggleAdmin('@user.Id', @(roles.Contains("Admin").ToString().ToLower()))">
-                                @(roles.Contains("Admin") ? "Admin Kaldır" : "Admin Yap")
-                            </button>
-                        </td>
-                    </tr>
+                table tbody tr:hover {
+                    background: #0f172a;
                 }
-            </tbody>
-        </table>
 
+        /* === NEON ROLE BADGE BASE === */
+        .role-badge {
+            font-size: 12px;
+            padding: 6px 16px;
+            border-radius: 999px;
+            color: #fff;
+            font-weight: 600;
+            letter-spacing: .4px;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            box-shadow: 0 0 6px rgba(0,245,255,.6), 0 0 12px rgba(0,245,255,.4), inset 0 0 6px rgba(255,255,255,.15);
+            text-shadow: 0 0 4px rgba(255,255,255,.8), 0 0 8px rgba(0,245,255,.9);
+            transition: all .25s ease;
+        }
+
+            /* HOVER GLOW */
+            .role-badge:hover {
+                transform: scale(1.08);
+                box-shadow: 0 0 10px rgba(0,245,255,.9), 0 0 22px rgba(0,245,255,.7), inset 0 0 10px rgba(255,255,255,.25);
+            }
+
+        /* === ADMIN NEON (YEŞİL) === */
+        .role-admin {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            box-shadow: 0 0 6px rgba(34,197,94,.7), 0 0 16px rgba(34,197,94,.6);
+            text-shadow: 0 0 6px rgba(34,197,94,.9);
+        }
+
+        /* === EMPLOYEE NEON (TURUNCU) === */
+        .role-employee {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            box-shadow: 0 0 6px rgba(249,115,22,.7), 0 0 16px rgba(249,115,22,.6);
+            text-shadow: 0 0 6px rgba(249,115,22,.9);
+        }
+
+
+        .role-select {
+            background: #020617;
+            color: #fff;
+            border-radius: 12px;
+            padding: 6px 12px;
+            border: 1px solid rgba(0,245,255,.3);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .status-online {
+            background-color: #22c55e;
+            box-shadow: 0 0 6px rgba(34, 197, 94, 0.9), 0 0 12px rgba(34, 197, 94, 0.7), 0 0 20px rgba(34, 197, 94, 0.5);
+            animation: onlinePulse 1.5s infinite;
+        }
+
+        .status-offline {
+            background-color: #7f1d1d; /* koyu kırmızı */
+            box-shadow: 0 0 4px rgba(127, 29, 29, 0.6), inset 0 0 4px rgba(0, 0, 0, 0.6);
+            opacity: 0.85;
+        }
+        /* ===== FILTER INPUT & SELECT ===== */
+        .filter-input,
+        .filter-select {
+            background: #0b0f1a;
+            border: 1px solid rgba(0,245,255,.35);
+            color: #fff;
+            border-radius: 12px;
+            padding: 10px 14px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+            .filter-input:focus,
+            .filter-select:focus {
+                outline: none;
+                border-color: #00f5ff;
+                box-shadow: 0 0 12px rgba(0,245,255,.5);
+                background: #0b0f1a;
+                color: #fff;
+            }
+
+            /* Eğer placeholder renklerini de değiştirmek isterseniz */
+            .filter-input::placeholder,
+            .filter-select::placeholder {
+                color: rgba(255,255,255,.6);
+            }
+
+        /* Responsive için biraz margin ekleyebilirsiniz */
+        .filter-input,
+        .filter-select {
+            margin-bottom: 12px;
+        }
+
+    </style>
+
+    <div class="container mt-5 mb-5">
+        <div class="neon-card">
+
+                <h4 class="neon-title">
+                    <i class="bi bi-people-fill me-2"></i> Kullanıcılar
+                </h4>
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                    <input type="text" id="userSearch" class="filter-input" placeholder="Kullanıcı adı veya email ara..." onkeyup="filterUsers()" />
+                    </div>
+
+                    <div class="col-md-4">
+                    <select id="roleFilter" class="filter-select" onchange="filterUsers()">
+                        <option value="">Tüm Roller</option>
+                        <option value="admin">Admin</option>
+                        <option value="employee">Employee</option>
+                        <option value="user">User</option>
+                    </select>
+                    </div>
+
+                    <div class="col-md-4">
+                    <select id="statusFilter" class="filter-select" onchange="filterUsers()">
+                        <option value="">Tüm Durumlar</option>
+                        <option value="online">Online</option>
+                        <option value="offline">Offline</option>
+                    </select>
+                    </div>
+                </div>
+
+                <table class="table table-borderless align-middle" id="userTable">
+
+                <thead>
+                    <tr>
+                        <th>Kullanıcı Adı</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Durum</th>
+                        <th class="text-end">İşlem</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        var roles = await UserManager.GetRolesAsync(user);
+                        var currentRole =
+                        roles.Contains("Admin") ? "Admin" :
+                        roles.Contains("Employee") ? "Employee" :
+                        "User";
+
+                        <tr>
+                                <td class="user-name">@user.UserName</td>
+                                <td class="user-email">@user.Email</td>
+
+
+                            <!-- 🔹 ROLE (SADECE GÖSTERİM) -->
+                            <td id="role_text_@user.Id" class="user-role">
+
+                                @if (currentRole == "Admin")
+                                {
+                                    <span class="role-badge role-admin">Admin</span>
+                                }
+                                else if (currentRole == "Employee")
+                                {
+                                    <span class="role-badge role-employee">Employee</span>
+                                }
+                                else
+                                {
+                                    <span class="role-badge">User</span>
+                                }
+                            </td>
+                            <td id="status_@user.Id" class="user-status">
+                                <span class="status-dot status-offline"></span>
+                                <span>Offline</span>
+                            </td>
+
+
+                            <!-- 🔹 ACTION (DROPDOWN) -->
+                            <td class="text-end">
+                                <select class="role-select"
+                                        onchange="changeRole('@user.Id', this.value)">
+                                    <option value="User" selected="@(currentRole == "User")">User</option>
+                                    <option value="Employee" selected="@(currentRole == "Employee")">Employee</option>
+                                    <option value="Admin" selected="@(currentRole == "Admin")">Admin</option>
+                                </select>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
     </div>
-</div>
 
-<script>
-    function toggleAdmin(userId, isAdmin) {
-        let url = isAdmin
-            ? '/Admin/RemoveAdmin'
-            : '/Admin/MakeAdmin';
+    <script>
+        function changeRole(userId, role) {
 
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: { userId: userId },
-            success: function (res) {
-                if (!res.success && res.message) {
-                    showToast(res.message);
+            $.post("/Admin/ChangeRole", {
+                userId: userId,
+                role: role
+            })
+            .done(function (res) {
+
+                if (!res.success) {
+                    alert(res.message);
+                    location.reload();
                     return;
                 }
-                if (!res.success) return;
 
-                let actionCell = $("#action_" + userId);
-                let roleCell = $("#roles_" + userId);
+                let badgeHtml = "";
 
-                if (res.isAdmin) {
-                    actionCell.html(`
-                        <button class="action-btn btn-remove"
-                                onclick="toggleAdmin('${userId}', true)">
-                            Admin Kaldır
-                        </button>
-                    `);
-                    roleCell.append(`<span class="role-badge">Admin</span>`);
-                } else {
-                    actionCell.html(`
-                        <button class="action-btn btn-admin"
-                                onclick="toggleAdmin('${userId}', false)">
-                            Admin Yap
-                        </button>
-                    `);
-                    roleCell.find(".role-badge:contains('Admin')").remove();
+                if (role === "Admin") {
+                    badgeHtml = `<span class="role-badge role-admin">Admin</span>`;
                 }
-            },
-            error: function () {
-                showToast("İşlem sırasında hata oluştu!");
+                else if (role === "Employee") {
+                    badgeHtml = `<span class="role-badge role-employee">Employee</span>`;
+                }
+                else {
+                    badgeHtml = `<span class="role-badge">User</span>`;
+                }
+
+                $("#role_text_" + userId).html(badgeHtml);
+            })
+            .fail(function () {
+                alert("Rol değiştirilemedi");
+                location.reload();
+            });
+        }
+                function normalizeTR(text) {
+                return text
+                    .toLocaleLowerCase("tr-TR")
+                    .replace(/ı/g, "i")
+                    .replace(/İ/g, "i");
             }
-        });
+
+            function filterUsers() {
+
+                const search = normalizeTR(
+                    document.getElementById("userSearch").value
+                );
+
+                const roleFilter = normalizeTR(
+            document.getElementById("roleFilter").value);
+
+                const statusFilter = normalizeTR(
+            document.getElementById("statusFilter").value);
+
+                const rows =
+                    document.querySelectorAll("#userTable tbody tr");
+
+                rows.forEach(row => {
+
+                    const userName = normalizeTR(
+                        row.querySelector(".user-name").innerText
+                    );
+
+                    const email = normalizeTR(
+                        row.querySelector(".user-email").innerText
+                    );
+
+                    const roleText = normalizeTR(
+                        row.querySelector(".user-role").innerText
+                    );
+
+                    const statusText = normalizeTR(
+                        row.querySelector(".user-status").innerText
+                    );
+
+                    const matchSearch =
+                        userName.includes(search) ||
+                        email.includes(search);
+
+                    const matchRole =
+                        roleFilter === "" ||
+                        roleText.includes(roleFilter);
+
+                    const matchStatus =
+                        statusFilter === "" ||
+                        statusText.includes(statusFilter);
+
+                    row.style.display =
+                        matchSearch && matchRole && matchStatus
+                            ? ""
+                            : "none";
+                });
+            }
+    </script>
     }
-</script>
+    else
+    {
+    <div class="container mt-5 text-center">
+        <h1 class="text-danger">⛔ Yetkisiz Erişim</h1>
+        <p>Bu sayfaya erişim yetkiniz yok.</p>
+
+        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-primary mt-3">
+            Ana Sayfaya Dön
+        </a>
+    </div>
+    }
+    <script src="~/js/chta-ui.js"></script>

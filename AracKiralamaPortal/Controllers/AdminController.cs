@@ -1,12 +1,12 @@
 ﻿using AracKiralamaPortal.Data;
+using AracKiralamaPortal.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
-using AracKiralamaPortal.Models;
 
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,Employee")]
 public class AdminController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -18,12 +18,16 @@ public class AdminController : Controller
         _userManager = userManager;
     }
 
-    // ADMIN OLMAYANI ENGELLEME
-    public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    // 🔒 ADMIN DEĞİLSE ENGELLE
+    public override async Task OnActionExecutionAsync(
+     ActionExecutingContext context,
+     ActionExecutionDelegate next)
     {
         var user = await _userManager.GetUserAsync(context.HttpContext.User);
 
-        if (user == null || !await _userManager.IsInRoleAsync(user, "Admin"))
+        if (user == null ||
+            !(await _userManager.IsInRoleAsync(user, "Admin") ||
+              await _userManager.IsInRoleAsync(user, "Employee")))
         {
             context.Result = new RedirectToActionResult("Index", "Home", null);
             return;
@@ -32,73 +36,64 @@ public class AdminController : Controller
         await next();
     }
 
-    // DASHBOARD
+
+    // 📊 DASHBOARD
     public IActionResult Dashboard()
     {
         ViewBag.TotalCars = _context.Cars.Count();
         ViewBag.TotalBrands = _context.Brands.Count();
         ViewBag.TotalUsers = _context.Users.Count();
-
         return View();
     }
 
+    // 👥 KULLANICILAR
     public async Task<IActionResult> Users()
     {
         var users = await _userManager.Users.ToListAsync();
         return View(users);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> MakeAdmin(string userId)
+    public IActionResult Messages()
     {
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null)
-            return Json(new { success = false });
-
-        if (!await _userManager.IsInRoleAsync(user, "Admin"))
-        {
-            await _userManager.AddToRoleAsync(user, "Admin");
-        }
-
-        return Json(new
-        {
-            success = true,
-            isAdmin = true
-        });
+        return View();
     }
 
-
+    // 🔁 TEK ROL DEĞİŞTİRME (ADMIN / EMPLOYEE / USER)
     [HttpPost]
-    public async Task<IActionResult> RemoveAdmin(string userId)
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ChangeRole(string userId, string role)
     {
-        // Giriş yapan admin
-        var currentUserId = _userManager.GetUserId(User);
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return Json(new { success = false, message = "Kullanıcı bulunamadı" });
+        }
 
-        // Kendi adminliğini kaldırmayı engelle
-        if (userId == currentUserId)
+        // 🚫 Admin kendi rolünü düşüremez
+        var currentUserId = _userManager.GetUserId(User);
+        if (userId == currentUserId && role != "Admin")
         {
             return Json(new
             {
                 success = false,
-                message = "Kendi adminliğini kaldıramazsın!"
+                message = "Kendi admin rolünü değiştiremezsin!"
             });
         }
 
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user == null)
-            return Json(new { success = false });
-
-        if (await _userManager.IsInRoleAsync(user, "Admin"))
+        // 🔥 TÜM ROLLERİ TEMİZLE
+        var currentRoles = await _userManager.GetRolesAsync(user);
+        if (currentRoles.Any())
         {
-            await _userManager.RemoveFromRoleAsync(user, "Admin");
+            await _userManager.RemoveFromRolesAsync(user, currentRoles);
         }
+
+        // ➕ YENİ ROL ATA (User da dahil)
+        await _userManager.AddToRoleAsync(user, role);
 
         return Json(new
         {
             success = true,
-            isAdmin = false
+            role = role
         });
     }
 }
