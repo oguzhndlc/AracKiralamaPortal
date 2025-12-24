@@ -11,7 +11,6 @@
         overflow-x: hidden;
     }
 
-    /* CARD */
     .neon-card {
         background: #111827;
         border-radius: 18px;
@@ -25,7 +24,6 @@
         font-weight: 700;
     }
 
-    /* BUTTONS */
     .neon-btn {
         background: linear-gradient(135deg, #00f5ff, #a855f7);
         border: none;
@@ -50,7 +48,6 @@
         padding: 8px 14px;
     }
 
-    /* SEARCH */
     .search-input {
         background: #0b0f1a;
         border: 1px solid rgba(0,245,255,.35);
@@ -65,8 +62,6 @@
             border-color: #00f5ff;
             box-shadow: 0 0 12px rgba(0,245,255,.5);
         }
-
-    /* TABLE */
     table {
         color: #e5e7eb;
     }
@@ -78,8 +73,6 @@
             table tr:hover {
                 background: rgba(0,245,255,.08);
             }
-
-    /* SLIDE PANEL */
     .slide-panel {
         position: fixed;
         top: 0;
@@ -140,8 +133,6 @@
 <div class="container mt-5 mb-5">
 
     <div class="card neon-card p-4">
-
-        <!-- TITLE + SEARCH + BUTTON -->
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
             <h4 class="neon-title mb-0">
                 <i class="bi bi-tags-fill me-2"></i> Markalar
@@ -189,11 +180,7 @@
 
     </div>
 </div>
-
-<!-- OVERLAY -->
 <div class="overlay" id="overlay" onclick="closePanel()"></div>
-
-<!-- SLIDE PANEL -->
 <div class="slide-panel" id="slidePanel">
 
     <div class="panel-header">
@@ -253,8 +240,6 @@
                 .then(() => location.reload());
         }
     }
-
-    /* 🔍 TÜRKÇE UYUMLU ARAMA */
     function filterBrands() {
         const input = document.getElementById("brandSearch")
             .value

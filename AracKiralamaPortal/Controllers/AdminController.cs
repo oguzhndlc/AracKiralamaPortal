@@ -20,8 +20,6 @@ namespace AracKiralamaPortal.Controllers
             _context = context;
             _userManager = userManager;
         }
-
-        // 🔒 ADMIN DEĞİLSE ENGELLE
         public override async Task OnActionExecutionAsync(
          ActionExecutingContext context,
          ActionExecutionDelegate next)
@@ -40,7 +38,6 @@ namespace AracKiralamaPortal.Controllers
         }
 
 
-        // 📊 DASHBOARD
         public IActionResult Dashboard()
         {
             ViewBag.TotalCars = _context.Cars.Count();
@@ -49,7 +46,6 @@ namespace AracKiralamaPortal.Controllers
             return View();
         }
 
-        // 👥 KULLANICILAR
         public async Task<IActionResult> Users()
         {
             var users = await _userManager.Users.ToListAsync();
@@ -61,7 +57,6 @@ namespace AracKiralamaPortal.Controllers
             return View();
         }
 
-        // 🔁 TEK ROL DEĞİŞTİRME (ADMIN / EMPLOYEE / USER)
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ChangeRole(string userId, string role)
@@ -72,7 +67,6 @@ namespace AracKiralamaPortal.Controllers
                 return Json(new { success = false, message = "Kullanıcı bulunamadı" });
             }
 
-            // 🚫 Admin kendi rolünü düşüremez
             var currentUserId = _userManager.GetUserId(User);
             if (userId == currentUserId && role != "Admin")
             {
@@ -83,14 +77,12 @@ namespace AracKiralamaPortal.Controllers
                 });
             }
 
-            // 🔥 TÜM ROLLERİ TEMİZLE
             var currentRoles = await _userManager.GetRolesAsync(user);
             if (currentRoles.Any())
             {
                 await _userManager.RemoveFromRolesAsync(user, currentRoles);
             }
 
-            // ➕ YENİ ROL ATA (User da dahil)
             await _userManager.AddToRoleAsync(user, role);
 
             return Json(new

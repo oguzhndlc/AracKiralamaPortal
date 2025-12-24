@@ -10,8 +10,6 @@
         console.warn("❌ userId yok, realtime başlatılmadı");
         return;
     }
-
-    // Global SignalR connection
     window.chatConnection = new signalR.HubConnectionBuilder()
         .withUrl("/chathub")
         .withAutomaticReconnect()
@@ -19,27 +17,22 @@
 
     const connection = window.chatConnection;
 
-    // Private message geldiğinde
     connection.on("ReceivePrivateMessage", data => {
         console.log("🔔 GLOBAL mesaj alındı:", data);
 
         const otherUserId = data.sender === userId ? data.receiver : data.sender;
         const otherUserName = data.sender === userId ? data.receiverName : data.senderName;
 
-        // Eğer mesaj gönderen bizsek, hiçbir işlem yapma
         if (data.sender === userId) return;
 
-        // Mesaj UI'ya eklensin
         if (window.appendMessageToUI) window.appendMessageToUI(data);
 
-        // Eğer kullanıcı şu an açık chat'te değilse toast göster
         if (window.selectedUser !== otherUserId) {
             if (window.showChatToast) window.showChatToast(otherUserName, data.text, otherUserId);
         }
     });
 
 
-    // Online users güncelleme
     connection.on("UpdateOnlineUsers", users => {
         console.log("🌐 Çevrimiçi kullanıcılar:", users);
         if (window.updateOnlineUsersUI) window.updateOnlineUsersUI(users);
@@ -52,7 +45,6 @@
         })
         .catch(err => console.error(err));
 
-    // -------------------- TOAST --------------------
     window.showChatToast = (title, message, userId, duration = 4000) => {
         let container = document.querySelector(".toast-container");
         if (!container) {
@@ -77,7 +69,6 @@
         }, duration);
     };
 
-    // -------------------- TOAST STYLE --------------------
     (function injectToastStyles() {
         if (document.getElementById("toast-style")) return;
 

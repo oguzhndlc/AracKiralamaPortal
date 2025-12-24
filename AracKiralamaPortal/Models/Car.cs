@@ -37,7 +37,6 @@ namespace AracKiralamaPortal.Models
         [Required(ErrorMessage = "Lütfen Araç Durumunu belirtin.")]
         public bool isAvailable { get; set; }
 
-        // Yeni eklemeler
         [Required(ErrorMessage = "Yakıt tipi alanı zorunludur.")]
         public string FuelType { get; set; }
 

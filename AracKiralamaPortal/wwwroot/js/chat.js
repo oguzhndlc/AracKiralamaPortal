@@ -12,7 +12,7 @@
     const typingStatus = document.getElementById("typingStatus");
     const chatTitle = document.getElementById("chatTitle");
 
-    let selectedUser = ""; // "" => Genel Sohbet
+    let selectedUser = "";
     let typingTimeout = null;
     let lastTypingSent = 0;
 
@@ -21,7 +21,6 @@
         private: {}
     };
 
-    // ---------------- SIGNALR ----------------
     const connection = new signalR.HubConnectionBuilder()
         .withUrl("/chathub")
         .withAutomaticReconnect()
@@ -36,7 +35,6 @@
         })
         .catch(err => console.error(err));
 
-    // ---------------- MESAJ GÖNDER ----------------
     function sendMessage() {
         if (!messageInput || !messageInput.value.trim()) return;
 
@@ -59,7 +57,6 @@
         if (e.key === "Enter") sendMessage();
     });
 
-    // ---------------- TYPING ----------------
     messageInput?.addEventListener("input", () => {
         const now = Date.now();
         if (now - lastTypingSent > 500) {
@@ -76,7 +73,6 @@
         connection.invoke("StopTyping", selectedUser || null);
     }
 
-    // ---------------- RECEIVE ----------------
     connection.on("ReceiveMessage", data => {
         messageCache.general.push(data);
 
@@ -110,21 +106,17 @@
 
     connection.on("UpdateOnlineUsers", users => {
         console.log("ONLINE USERS:", users);
-        // 1️⃣ Sidebar Online Listesi
         const list = document.getElementById("onlineUsers");
         if (list) {
             list.innerHTML = "";
             users.forEach(u => {
-                if (u.id === userId) return; // kendimiz hariç
-
+                if (u.id === userId) return;
                 const li = document.createElement("li");
                 li.textContent = u.username;
                 li.onclick = () => selectUser(u.id, u.username);
                 list.appendChild(li);
             });
         }
-
-        // 2️⃣ Status Tablosu Güncelleme
         document.querySelectorAll("td[id^='status_']").forEach(td => {
             const dot = td.querySelector(".status-dot");
             const text = td.querySelector("span:last-child");
@@ -161,8 +153,6 @@
             if (typingStatus) typingStatus.innerText = "";
         }
     });
-
-    // ---------------- UI ----------------
     window.selectUser = function (id, name) {
         selectedUser = id;
         chatTitle.innerText = name || "Genel Sohbet";
@@ -299,7 +289,6 @@
         <div>${message}</div>
     `;
 
-        // 👉 TOASTA TIKLANINCA CHAT AÇ
         toast.addEventListener("click", () => {
             selectUser(userId, userName);
             toast.remove();

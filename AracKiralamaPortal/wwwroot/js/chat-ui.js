@@ -14,13 +14,12 @@
     window.selectedUser = "";
     let messageCache = { general: [], private: {} };
 
-    const connection = window.chatConnection; // Eğer chat-realtime.js yüklenmişse
+    const connection = window.chatConnection;
     if (!connection) {
         console.error("❌ SignalR connection bulunamadı");
         return;
     }
 
-    // ---------------- MESAJ GÖNDER ----------------
     function sendMessage() {
         if (!messageInput || !messageInput.value.trim()) return;
 
@@ -35,7 +34,6 @@
             time: time
         };
 
-        // SignalR ile gönder
         if (window.selectedUser) {
             connection.invoke("SendPrivateMessage", window.selectedUser, text)
                 .catch(err => console.error("❌ Private message gönderilemedi:", err));
@@ -44,7 +42,6 @@
                 .catch(err => console.error("❌ Genel mesaj gönderilemedi:", err));
         }
 
-        // Cache ve UI
         if (window.selectedUser) {
             messageCache.private[window.selectedUser] = messageCache.private[window.selectedUser] || [];
             messageCache.private[window.selectedUser].push(messageData);
@@ -57,17 +54,15 @@
         stopTyping();
     }
 
-    // ---------------- EVENT LISTENER ----------------
     document.getElementById("sendMessage")?.addEventListener("click", sendMessage);
 
     messageInput?.addEventListener("keydown", e => {
         if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault(); // Enter ile yeni satır engellenir
+            e.preventDefault();
             sendMessage();
         }
     });
 
-    // -------------------- CHAT SEÇİMİ --------------------
     window.selectUser = function (id, name) {
         window.selectedUser = id;
         chatTitle.innerText = name || "Genel Sohbet";
@@ -126,70 +121,56 @@
         const badge = document.getElementById(`badge-${id}`);
         if (badge) badge.style.display = "none";
     }
-
-    // -------------------- GLOBAL MESAJ EKLEME --------------------
     window.appendMessageToUI = (data) => {
         const senderId = data.sender === userId ? data.receiver : data.sender;
 
-        // Sadece karşı taraftan gelen mesajlar için
         const isMyMessage = data.sender === userId;
         if (!isMyMessage && senderId) {
             updateUnreadBadge(senderId);
             showToast(data.senderName, data.text, senderId, data.senderName);
         }
 
-
-        // Cache ekle
         if (senderId) {
             messageCache.private[senderId] = messageCache.private[senderId] || [];
             messageCache.private[senderId].push(data);
         } else {
             messageCache.general.push(data);
         }
-
-        // Seçili kullanıcıya göster
         if (window.selectedUser === senderId || (!senderId && window.selectedUser === "")) {
             appendMessage(data);
             clearUnreadBadge(senderId);
         }
-
-        // Chat listesine ekle
         addChatToListIfNeeded(senderId, data.senderName);
     };
 
-
-    // -------------------- ÇEVRİMİÇİ KULLANICILAR --------------------
     connection.on("UpdateOnlineUsers", users => {
         console.log("ONLINE USERS:", users);
 
-        const list = document.getElementById("onlineUsersList"); // doğru ID
+        const list = document.getElementById("onlineUsersList");
         if (!list) return;
 
-        list.innerHTML = ""; // önce temizle
+        list.innerHTML = "";
 
         users.forEach(u => {
-            if (u.id === userId) return; // kendimizi göstermeyelim
+            if (u.id === userId) return;
 
             const li = document.createElement("li");
-            li.textContent = u.username; // property isimleri SignalR’dan gelene uygun olmalı
+            li.textContent = u.username;
             li.onclick = () => selectUser(u.id, u.username);
 
-            // badge için span ekleyebiliriz
             const badge = document.createElement("span");
             badge.id = `badge-${u.id}`;
             badge.className = "badge";
-            badge.style.display = "none"; // başlangıçta görünmesin
+            badge.style.display = "none";
             li.appendChild(badge);
 
             list.appendChild(li);
 
-            // Sohbet listesine ekle (chatList)
             addChatToListIfNeeded(u.id, u.username);
         });
     });
 
 
-    // -------------------- TYPING --------------------
     let typingTimeout = null;
     let lastTypingSent = 0;
 
@@ -201,7 +182,6 @@
         }
     }
 
-    // messageInput input event listener
     messageInput?.addEventListener("input", () => {
         const now = Date.now();
         if (now - lastTypingSent > 500) {
@@ -217,7 +197,6 @@
     });
 
 
-    // -------------------- URL’den kullanıcı aç --------------------
     const params = new URLSearchParams(window.location.search);
     const openUser = params.get("userId");
     if (openUser) selectUser(openUser, "Sohbet");

@@ -177,7 +177,6 @@
     gap: 12px;
 }
 
-/* RENK BADGE */
 .color-badge {
     position: relative;
     width: 60px;
@@ -194,7 +193,6 @@
         box-shadow: 0 0 18px rgba(0,245,255,.6);
     }
 
-    /* TOOLTIP */
     .color-badge::after {
         content: attr(data-color);
         position: absolute;
@@ -217,8 +215,6 @@
         opacity: 1;
         transform: translateX(-50%) translateY(-4px);
     }
-
-    /* SEÇİLİ RENK */
     .color-badge.selected {
         border-color: #00f5ff;
         box-shadow: 0 0 22px rgba(0,245,255,.9);
@@ -236,7 +232,6 @@
             text-shadow: 0 0 10px #000;
         }
 
-/* SEÇİLİ RENK LABEL */
 .selected-color-label {
     min-width: 130px;
     height: 130px;

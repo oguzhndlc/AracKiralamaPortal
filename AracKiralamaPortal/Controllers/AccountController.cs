@@ -76,7 +76,6 @@ public class AccountController : Controller
         if (!Directory.Exists(uploadFolder))
             Directory.CreateDirectory(uploadFolder);
 
-        // 🗑️ ESKİ FOTOĞRAFI SİL (default hariç)
         if (!string.IsNullOrEmpty(user.ProfileURL) &&
             user.ProfileURL != "default.png")
         {
@@ -87,7 +86,6 @@ public class AccountController : Controller
             }
         }
 
-        // 📁 Yeni dosya
         var newFileName = Guid.NewGuid() + Path.GetExtension(photo.FileName);
         var newFilePath = Path.Combine(uploadFolder, newFileName);
 
@@ -96,11 +94,9 @@ public class AccountController : Controller
             await photo.CopyToAsync(stream);
         }
 
-        // 💾 DB güncelle
         user.ProfileURL = newFileName;
         await _userManager.UpdateAsync(user);
 
-        // 🔥 CLAIM GÜNCELLE
         var claims = await _userManager.GetClaimsAsync(user);
         var oldClaim = claims.FirstOrDefault(c => c.Type == "ProfileURL");
 
@@ -112,7 +108,6 @@ public class AccountController : Controller
             new Claim("ProfileURL", "/images/profiles/" + newFileName)
         );
 
-        // 🔄 Cookie yenile
         await _signInManager.RefreshSignInAsync(user);
 
         return Json(new

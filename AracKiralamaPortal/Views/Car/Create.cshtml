@@ -16,7 +16,6 @@
                 @Html.AntiForgeryToken()
                 <div class="row g-4">
 
-                    <!-- Resim -->
                     <div class="col-md-6">
                         <label class="form-label">Resim</label>
                         <label class="neon-upload" id="imageLabel">
@@ -31,7 +30,6 @@
 
                     <div class="col-md-6"></div>
 
-                    <!-- Temel Bilgiler -->
                     <div class="col-md-4">
                         <label class="form-label">Model</label>
                         <input asp-for="Model" class="form-control" />
@@ -62,7 +60,6 @@
                         <input asp-for="EngineCapacity" class="form-control" />
                     </div>
 
-                    <!-- Seçimler -->
                     <div class="col-md-6">
                         <label class="form-label">Araç Tipi</label>
                         <select id="VehicleTypeId" asp-for="VehicleTypeId" asp-items="ViewBag.VehicleTypes" class="form-select"></select>
@@ -96,7 +93,6 @@
                         </select>
                     </div>
 
-                    <!-- RENK -->
                     <div class="col-md-6">
                         <label class="form-label">Renk</label>
                         <div class="d-flex align-items-center gap-3 mt-2">
@@ -126,7 +122,6 @@
                         <input asp-for="Color" type="hidden" id="Color" />
                     </div>
 
-                    <!-- Donanım -->
                     <div class="col-md-6">
                         <label class="form-label">Donanım</label>
                         <input type="hidden" name="HasAC" value="false" />
@@ -187,7 +182,6 @@
                 .catch(err => console.error('Alt tipler yüklenemedi:', err));
         }
 
-        // İlk yüklemede alt tipleri yükle
         const initialTypeId = vehicleTypeDropdown.value;
         const initialSubTypeId = '@Model?.VehicleSubTypeId' || '';
         loadSubTypes(initialTypeId, initialSubTypeId);
@@ -196,7 +190,6 @@
             loadSubTypes(this.value);
         });
 
-        // Renk seçimi
         const badges = document.querySelectorAll(".color-badge");
         const input = document.getElementById("Color");
         const label = document.getElementById("selectedColorLabel");
@@ -219,7 +212,6 @@
         }
     });
 
-    // Resim önizleme
     function previewNewImageInLabel(e) {
         const labelText = document.getElementById("imageLabelText");
         const imgInLabel = document.getElementById("imageInLabel");

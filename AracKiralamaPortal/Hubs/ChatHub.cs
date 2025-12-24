@@ -17,8 +17,6 @@ namespace AracKiralamaPortal.Hubs
             public string Username { get; set; }
             public List<string> ConnectionIds { get; set; } = new List<string>();
         }
-
-        // ---------------- REGISTER ----------------
         public async Task RegisterUser(string userId, string username)
         {
             var user = _onlineUsers.GetOrAdd(userId, _ => new UserConnectionInfo());
@@ -50,8 +48,6 @@ namespace AracKiralamaPortal.Hubs
             await BroadcastOnlineUsers();
             await base.OnDisconnectedAsync(exception);
         }
-
-        // ---------------- MESSAGES ----------------
         public async Task SendMessage(string message)
         {
             var sender = GetSender();
@@ -101,8 +97,6 @@ namespace AracKiralamaPortal.Hubs
                 Time = DateTime.Now.ToString("HH:mm:ss")
             });
         }
-
-        // ---------------- TYPING ----------------
         public async Task Typing(string targetUserId)
         {
             var sender = GetSender();
@@ -136,8 +130,6 @@ namespace AracKiralamaPortal.Hubs
                 await Clients.Others.SendAsync("UserStoppedTyping", sender.UserId);
             }
         }
-
-        // ---------------- HELPERS ----------------
         private async Task BroadcastOnlineUsers()
         {
             var users = _onlineUsers.Select(x => new

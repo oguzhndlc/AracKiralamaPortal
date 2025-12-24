@@ -1,19 +1,7 @@
-﻿/* ===== LAYOUT STYLES: HTML, BODY, NAVBAR, DROPDOWN, CONTAINER, FOOTER (Flexbox Fixed) ===== */
-
-:root {
-    --navbar-height: 64px; /* Navbar yüksekliği */
+﻿:root {
+    --navbar-height: 64px; 
 }
-
-
-
-
-
-
-/* ===== NAVBAR (Flexbox uyumlu hale getirildi) ===== */
 .navbar {
-    /* DÜZELT: Fixed Konumlandırma Kuralları Kaldırıldı */
-    /* position: fixed; top: 0; width: 100%; left: 0; right: 0; SİLİNDİ */
-    
     height: var(--navbar-height);
     display: flex;
     align-items: center; 
@@ -59,8 +47,6 @@
         box-shadow: 0 0 10px #38bdf8;
         border-radius: 10px;
     }
-
-/* ===== DROPDOWN MENU ===== */
 .dropdown-toggle {
     border-radius: 30px;
     display: flex !important;
@@ -120,7 +106,6 @@
         background: transparent;
     }
 
-/* ===== NEON ANIMATIONS (DROPDOWN İÇİN) ===== */
 .custom-item::before {
     content: "";
     position: absolute;
@@ -172,13 +157,10 @@
     color: #fff !important;
 }
 
-/* ===== CONTAINER (KAYDIRMA BÖLGESÝ) ===== */
 .container {
-    /* YENİ: Kalan alanı kapla ve kaydırmayı etkinleştir */
-    flex-grow: 1; /* Navbar ve Footer'dan sonra kalan tüm dikey alanı kaplar */
-    overflow-y: auto; /* Bu alan içinde kaydırma çubuğu görünür */
-    padding-bottom: 30px; /* Alttaki footer'a sıkışmaması için ek boşluk */
-    
+    flex-grow: 1; 
+    overflow-y: auto;
+    padding-bottom: 30px;
     background: rgba(15, 32, 39, 0.55);
     backdrop-filter: blur(14px);
     border-radius: 24px;

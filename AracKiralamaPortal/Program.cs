@@ -9,26 +9,20 @@ using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🌍 KÜLTÜR AYARI (TR)
 var culture = new CultureInfo("tr-TR");
 CultureInfo.DefaultThreadCurrentCulture = culture;
 CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-// JSON Site Settings
 builder.Services.AddSingleton<SiteSettingsService>();
 
-// MVC
 builder.Services.AddControllersWithViews();
 
-// DB CONTEXT
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// REPOSITORY
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-// IDENTITY
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
@@ -39,12 +33,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Home/Index";
 });
 
-// SignalR servisini ekleyin
 builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-// SeedRoles ve SeedAdmin metotları (mevcut kodunuzun devamı)
 
 async Task SeedRoles(IServiceProvider services)
 {
@@ -70,7 +62,6 @@ async Task SeedAdmin(IServiceProvider services)
 
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
-    // Admin kullanıcı yoksa oluştur
     if (adminUser == null)
     {
         adminUser = new ApplicationUser
@@ -84,12 +75,10 @@ async Task SeedAdmin(IServiceProvider services)
 
         if (!result.Succeeded)
         {
-            return; // oluşturulamazsa devam etme
+            return; 
         }
     }
 
-    // 🔒 KRİTİK KISIM
-    // Program HER AÇILDIĞINDA admin rolünü garanti et
     if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
     {
         await userManager.AddToRoleAsync(adminUser, "Admin");
@@ -103,7 +92,6 @@ using (var scope = app.Services.CreateScope())
     await SeedAdmin(scope.ServiceProvider);
 }
 
-// ERROR HANDLER
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -115,7 +103,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// Identity middleware
 app.UseAuthentication();
 app.UseAuthorization();
 

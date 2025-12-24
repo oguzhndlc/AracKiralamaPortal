@@ -14,15 +14,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <style>
-    /* ===== PROFILE CARD (BBBootstrap uyarlama) ===== */
-
     .profile-card {
         border-radius: 8px;
         box-shadow: 0 1px 20px rgba(69,90,100,.08);
         overflow: visible;
     }
-
-    /* Sol alan */
     .profile-left {
         background: linear-gradient(200deg, #56DCB6, #56C0DC, #567CDC);
         color: #fff;
@@ -39,8 +35,6 @@
             font-size: 14px;
             opacity: .9;
         }
-
-    /* Profil foto */
     .profile-photo-wrapper {
         position: relative;
         width: 200px;
@@ -73,8 +67,6 @@
     .profile-photo-wrapper:hover .photo-overlay {
         opacity: 1;
     }
-
-    /* Sağ alan */
     .profile-right {
         padding: 30px;
         color:black;
@@ -105,8 +97,6 @@
             padding-bottom: 5px;
             margin-bottom: 20px;
         }
-
-    /* Editable */
     .editable {
         cursor: pointer;
         border-radius: 6px;
@@ -147,8 +137,6 @@
     <div class="col-xl-8 col-md-12">
         <div class="card profile-card">
             <div class="row g-0">
-
-                <!-- SOL TARAF -->
                 <div class="col-md-4 profile-left">
 
                     <div class="profile-photo-wrapper"
@@ -166,8 +154,6 @@
                     <h6>@Model.Name @Model.Surname</h6>
                     <p>@Model.Username</p>
                 </div>
-
-                <!-- SAĞ TARAF -->
                 <div class="col-md-8 profile-right">
 
                     <h6 class="section-title">Bilgiler</h6>
@@ -231,7 +217,6 @@
     </div>
 </div>
 <div class="toast-center-wrapper">
-    <!-- PROFİL BİLGİ TOAST -->
     <div id="editToast"
          class="toast mb-2"
          data-bs-autohide="false">
@@ -248,8 +233,6 @@
             </button>
         </div>
     </div>
-
-    <!-- PROFİL FOTO TOAST -->
     <div id="photoToast"
          class="toast"
          data-bs-autohide="false">
@@ -281,11 +264,6 @@
     document.addEventListener("DOMContentLoaded", function () {
 
         const wrapper = document.querySelector(".toast-center-wrapper");
-
-        /* ==========================
-           PROFİL FOTOĞRAF TOAST
-        ========================== */
-
         const photoWrapper = document.getElementById("profilePhoto");
         const photoToastEl = document.getElementById("photoToast");
 
@@ -303,7 +281,7 @@
                 document.getElementById("photoPreview").src =
                     "/images/profiles/" + current;
 
-                wrapper.classList.add("show");   // 👈 wrapper aktif
+                wrapper.classList.add("show");   
                 photoToast.show();
             });
 
@@ -345,8 +323,6 @@
                 wrapper.classList.remove("show");
             });
         }
-
-        /*PROFİL BİLGİ TOAST*/
 
         let selectedField = "";
         let selectedTd = null;
@@ -398,8 +374,6 @@
                     }
                 });
             });
-
-        // 👇 BİLGİ TOAST KAPANINCA WRAPPER'I KAPAT
         editToastEl.addEventListener("hidden.bs.toast", () => {
             wrapper.classList.remove("show");
         });

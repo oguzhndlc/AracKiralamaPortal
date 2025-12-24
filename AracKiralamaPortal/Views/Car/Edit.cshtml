@@ -18,7 +18,6 @@
 
                 <div class="row g-4">
 
-                    <!-- Mevcut Resim -->
                     <div class="col-md-6">
                         <label class="form-label">Mevcut Resim</label><br />
 
@@ -29,7 +28,6 @@
                         </label>
                     </div>
 
-                    <!-- Yeni Resim -->
                     <div class="col-md-6">
                         <label class="form-label">Yeni Resim</label>    
 
@@ -42,9 +40,6 @@
                                    onchange="previewNewImageInLabel(event)" />
                         </label>
                     </div>
-
-
-                    <!-- TEMEL -->
                     <div class="col-md-6">
                         <label class="form-label">Model</label>
                         <input asp-for="Model" class="form-control" />
@@ -74,8 +69,6 @@
                         <label class="form-label">Motor Hacmi (cc)</label>
                         <input asp-for="EngineCapacity" class="form-control" />
                     </div>
-
-                    <!-- SEÇİMLER -->
                     <div class="col-md-6">
                         <label class="form-label">Araç Tipi</label>
                         <select id="VehicleTypeId" asp-for="VehicleTypeId" asp-items="ViewBag.VehicleTypes" class="form-select"></select>
@@ -107,18 +100,13 @@
                             <option value="false">Müsait Değil</option>
                         </select>
                     </div>
-
-                    <!-- RENK -->
                     <div class="col-md-6">
                         <label class="form-label">Renk</label>
 
                         <div class="d-flex align-items-center gap-3 mt-2">
-                            <!-- Seçili Renk Göstergesi -->
                             <div id="selectedColorLabel" class="selected-color-label">
                                 Renk Seçilmedi
                             </div>
-
-                            <!-- Renkler -->
                             <div class="color-badges" id="colorBadges">
                                 <span class="color-badge" data-color="Siyah" style="--c:#000000"></span>
                                 <span class="color-badge" data-color="Beyaz" style="--c:#ffffff"></span>
@@ -144,7 +132,6 @@
 
                         <input asp-for="Color" type="hidden" id="Color"/>
                     </div>
-                    <!-- DONANIM -->
                     <div class="col-md-6">
                         <label class="form-label">Donanım</label>
 
@@ -180,7 +167,6 @@
 </div>
 <script src="~/js/site.js"></script>
 <script>
-    /* === RESİM ÖNİZLEME (EDIT) === */
     function previewNewImageInLabel(e) {
         const labelText = document.getElementById("imageLabelText");
         const imgInLabel = document.getElementById("imageInLabel");
@@ -189,8 +175,6 @@
             const file = e.target.files[0];
             imgInLabel.src = URL.createObjectURL(file);
             imgInLabel.classList.remove("d-none");
-
-            // İsteğe bağlı: yazıyı gizleyebilirsin
             labelText.style.display = "none";
         }
     }
@@ -203,15 +187,11 @@
             img.src = URL.createObjectURL(e.target.files[0]);
         }
     }
-
-    /* === RENK SEÇİM === */
     const badges = document.querySelectorAll(".color-badge");
     const input = document.getElementById("Color");
     const label = document.getElementById("selectedColorLabel");
 
     badges.forEach(badge => {
-
-        // EDIT SAYFASI → mevcut renk otomatik seçili gelsin
         if (input && badge.dataset.color === input.value) {
             selectColor(badge);
         }

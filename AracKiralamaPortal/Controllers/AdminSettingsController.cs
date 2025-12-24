@@ -22,25 +22,19 @@ public class AdminSettingsController: Controller
     [HttpPost]
     public IActionResult Index(SiteSettings model, IFormFile siteLogoFile)
     {
-        string defaultLogo = "default_logo.png"; // default logonun dosya adı
+        string defaultLogo = "default_logo.png"; 
         var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/site");
 
-        // Klasör yoksa oluştur
         if (!Directory.Exists(uploadFolder))
             Directory.CreateDirectory(uploadFolder);
-
-        // Logo dosyası yüklenmişse
         if (siteLogoFile != null && siteLogoFile.Length > 0)
         {
-            // Mevcut logo varsa ve default değilse sil
             if (!string.IsNullOrEmpty(model.siteLogo) && model.siteLogo != defaultLogo)
             {
                 var oldPath = Path.Combine(uploadFolder, model.siteLogo);
                 if (System.IO.File.Exists(oldPath))
                     System.IO.File.Delete(oldPath);
             }
-
-            // Yeni dosyayı kaydet
             var fileName = Guid.NewGuid().ToString() + Path.GetExtension(siteLogoFile.FileName);
             var filePath = Path.Combine(uploadFolder, fileName);
             using (var stream = new FileStream(filePath, FileMode.Create))
@@ -48,11 +42,9 @@ public class AdminSettingsController: Controller
                 siteLogoFile.CopyTo(stream);
             }
 
-            // JSON'a kaydetmek için model.siteLogo'yu güncelle
             model.siteLogo = fileName;
         }
 
-        // Diğer ayarları kaydet
         _settingsService.SaveSettings(model);
         ViewBag.Message = "Ayarlar başarıyla kaydedildi!";
         return View(model);

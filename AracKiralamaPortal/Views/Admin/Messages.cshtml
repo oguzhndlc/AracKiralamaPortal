@@ -15,7 +15,6 @@
         font-family: 'Segoe UI', sans-serif;
         }
 
-        /* SIDEBAR */
         .sidebar {
         width: 280px;
         background: #1f2c3a;
@@ -48,8 +47,6 @@
         .user-list li:hover {
         background: #2c3e50;
         }
-
-        /* CHAT PANEL */
         .chat-panel {
         flex: 1;
         display: flex;
@@ -122,7 +119,7 @@
         }
 
         .user-list li {
-        position: relative; /* badge için gerekli */
+        position: relative;
         padding: 12px;
         border-radius: 8px;
         cursor: pointer;
@@ -155,17 +152,13 @@
 
     <div class="chat-container">
 
-        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-header">Online Kullanıcılar</div>
             <ul id="onlineUsersList" class="user-list"></ul>
 
             <div class="sidebar-header" style="margin-top: 20px;">Sohbetler</div>
-            <ul id="chatList" class="user-list"></ul> <!-- Yeni sohbetler burada listelenecek -->
+            <ul id="chatList" class="user-list"></ul> 
         </aside>
-
-
-        <!-- CHAT PANEL -->
         <section class="chat-panel">
 
             <header class="chat-header">

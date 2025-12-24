@@ -1,23 +1,15 @@
-﻿/* ===== ADMIN CUSTOM STYLES (SB Admin 2 Override) ===== */
-
-/* Koyu Temayı tüm Admin Sayfalarına Uygula */
-.dark-theme-body {
-    /* Genel Layout'tan alınan koyu arkaplan */
+﻿.dark-theme-body {
     background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
-    color: #e2e8f0; /* Açık yazı rengi */
-    overflow-y: hidden; /* Tam ekran yapısı için ana kaydırmayı kapat */
+    color: #e2e8f0; 
+    overflow-y: hidden; 
 }
 
-/* SB Admin 2'nin varsayılan kaydırmasını override et */
 #content-wrapper {
     background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    overflow-y: auto !important; /* İçeriğin kaymasını sağlar */
-    height: 100vh; /* Tam dikey alanı kaplar */
+    overflow-y: auto !important; 
+    height: 100vh; 
 }
-
-/* ===== SIDEBAR STYLES (Yan Menü) ===== */
 .admin-sidebar-dark {
-    /* Navbar'daki gibi koyu ve blur efekti */
     background: rgba(15, 32, 39, 0.9) !important; 
     border-right: 1px solid rgba(255,255,255,0.08);
     backdrop-filter: blur(8px);
@@ -25,23 +17,22 @@
 }
 
 .admin-sidebar-dark .sidebar-brand {
-    color: #38bdf8 !important; /* Marka rengi */
+    color: #38bdf8 !important; 
     background-color: transparent !important;
     border-bottom: 1px solid rgba(255,255,255,0.06);
     box-shadow: 0 5px 10px rgba(0,0,0,.2);
 }
 
 .admin-sidebar-dark .nav-item .nav-link {
-    color: #e2e8f0; /* Menü link rengi */
+    color: #e2e8f0; 
     transition: all .3s ease;
 }
 
 .admin-sidebar-dark .nav-item .nav-link i {
-    color: #94a3b8; /* İkon rengi */
-}
+    color: #94a3b8; 
 
 .admin-sidebar-dark .nav-item .nav-link:hover {
-    background-color: rgba(56,189,248,.1); /* Hover arkaplanı */
+    background-color: rgba(56,189,248,.1); 
     color: #38bdf8;
     border-radius: 6px;
 }
@@ -53,15 +44,10 @@
     font-weight: 600;
     border-left: 3px solid #38bdf8;
 }
-
-/* Sidebar Başlıkları */
 .admin-sidebar-dark .sidebar-heading {
     color: #94a3b8;
 }
-
-/* ===== TOPBAR STYLES (Üst Çubuk) ===== */
 .admin-topbar-dark {
-    /* Navbar'daki gibi koyu ve blur efekti */
     background: rgba(15, 32, 39, 0.75) !important;
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -77,16 +63,12 @@
     color: #38bdf8 !important;
 }
 
-/* ===== MAIN CONTENT AREA (İçerik) ===== */
 .admin-main-content {
-    /* Ana Layout'tan alınan glass container stilini uygula */
     backdrop-filter: blur(14px);
     padding: 30px;
     margin-top: 20px;
     margin-bottom: 20px;
 }
-
-/* Admin Paneli İçindeki Kartlar */
 .card {
     background: rgba(15, 32, 39, 0.75);
     border: none;
