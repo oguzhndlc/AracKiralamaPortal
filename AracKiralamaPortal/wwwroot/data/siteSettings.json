@@ -1,5 +1,17 @@
 {
-  "SiteName": "COD  Rent aCar",
-  "CompanyPhone": "\u002B90 555 000 1234",
-  "CompanyEmail": "marka@mail.com"
+  "siteName": "COD  Rent aCar",
+  "siteLogo": null,
+  "companyPhone": "\u002B90 555 000 1234",
+  "companyEmail": "marka@mail.com",
+  "latitude": 36.905825,
+  "longitude": 30.653554,
+  "companyAddress": "K\u00FClt\u00FCr, 3876. Sk. No:39, 07090 Baht\u0131l\u0131 K\u00F6y\u00FC K\u00F6y\u00FC /Kepez/Antalya",
+  "igLink": "https://www.instagram.com/",
+  "igOK": true,
+  "xLink": "https://www.x.com/",
+  "xOK": false,
+  "fbLink": "https://www.facebook.com/",
+  "fbOK": false,
+  "ytLink": "https://www.youtube.com/",
+  "ytOK": true
 }

@@ -9,6 +9,8 @@ namespace AracKiralamaPortal.Repositories
 
         public IRepository<Brand> Brands { get; private set; }
         public IRepository<Car> Cars { get; private set; }
+        public IRepository<VehicleType> VehicleTypes { get; private set; }
+        public IRepository<VehicleSubType> VehicleSubTypes { get; private set; }
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -16,6 +18,9 @@ namespace AracKiralamaPortal.Repositories
 
             Brands = new Repository<Brand>(context);
             Cars = new Repository<Car>(context);
+            VehicleTypes = new Repository<VehicleType>(context);
+            VehicleSubTypes = new Repository<VehicleSubType>(context);
+
         }
 
         public void Save()

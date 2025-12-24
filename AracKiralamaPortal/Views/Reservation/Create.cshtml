@@ -1,0 +1,197 @@
+﻿@model AracKiralamaPortal.Models.Reservation
+
+@{
+    ViewData["Title"] = "Rezervasyon Oluştur";
+    var car = ViewBag.SelectedCar as AracKiralamaPortal.Models.Car;
+}
+
+<style>
+    /* NEON CAR CARD */
+    .neon-car-card {
+        display: flex;
+        gap: 18px;
+        padding: 18px;
+        border-radius: 18px;
+        background: linear-gradient( 135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04) );
+        border: 1px solid rgba(0, 255, 255, 0.25);
+        box-shadow: 0 0 20px rgba(0,255,255,0.15), inset 0 0 20px rgba(255,255,255,0.05);
+        transition: all .35s ease;
+    }
+
+        .neon-car-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 28px rgba(0,255,255,0.35), inset 0 0 25px rgba(255,255,255,0.08);
+        }
+
+    /* IMAGE */
+    .neon-car-image img {
+        width: 140px;
+        height: 95px;
+        object-fit: cover;
+        border-radius: 14px;
+        box-shadow: 0 0 18px rgba(0,0,0,0.5);
+    }
+
+    /* BODY */
+    .neon-car-body {
+        flex: 1;
+        color: #e5faff;
+    }
+
+    /* TITLE */
+    .neon-car-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .neon-year {
+        font-size: 13px;
+        opacity: .75;
+        margin-left: 6px;
+    }
+
+    /* TAGS */
+    .neon-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+        .neon-tags span {
+            padding: 4px 10px;
+            font-size: 12.5px;
+            border-radius: 999px;
+            background: rgba(0,255,255,0.08);
+            border: 1px solid rgba(0,255,255,0.25);
+            color: #bffcff;
+        }
+
+    /* FOOTER */
+    .neon-car-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* PRICE */
+    .neon-price {
+        font-size: 20px;
+        font-weight: 700;
+        color: #00f6ff;
+    }
+
+        .neon-price span {
+            font-size: 13px;
+            opacity: .8;
+        }
+
+    /* STATUS */
+    .neon-status {
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+        .neon-status.available {
+            background: rgba(34,197,94,.15);
+            color: #22c55e;
+            border: 1px solid rgba(34,197,94,.4);
+        }
+
+        .neon-status.unavailable {
+            background: rgba(239,68,68,.15);
+            color: #ef4444;
+            border: 1px solid rgba(239,68,68,.4);
+        }
+
+</style>
+
+<div class="reservation-wrapper">
+
+    <div class="reservation-card">
+
+        <h2 class="text-center mb-4">🚗 Rezervasyon Oluştur</h2>
+
+        @* ARAÇ DETAY KARTI *@
+        @if (car != null)
+        {
+            <div class="neon-car-card mb-4">
+
+                <div class="neon-car-image">
+                    <img src="@car.ImagePath" alt="Araç">
+                </div>
+
+                <div class="neon-car-body">
+                    <h4 class="neon-car-title">
+                        @car.Brand?.Name @car.Model
+                        <span class="neon-year">@car.Year</span>
+                    </h4>
+
+                    <div class="neon-tags">
+                        <span>@car.VehicleType?.Name</span>
+                        <span>@car.VehicleSubType?.Name</span>
+                        <span>@car.GearType</span>
+                        <span>@car.FuelType</span>
+                        <span>@car.EngineCapacity cc</span>
+                        <span>@car.EnginePower hp</span>
+                        <span>@car.Mileage km</span>
+                        <span>@car.Color</span>
+                        <span>@(car.HasAC ? "Klima" : "Klima Yok")</span>
+                        <span>@(car.HasGPS ? "GPS" : "GPS Yok")</span>
+                    </div>
+
+                    <div class="neon-car-footer">
+                        <div class="neon-price">
+                            @car.Price ₺ <span>/ gün</span>
+                        </div>
+
+                        <div class="neon-status @(car.isAvailable ? "available" : "unavailable")">
+                            @(car.isAvailable ? "Müsait" : "Müsait Değil")
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+
+
+        @* REZERVASYON FORMU *@
+        <form asp-controller="Reservation" asp-action="Create" method="post">
+
+            <div class="form-group mb-3">
+                <label class="form-label">Araç</label>
+                <select asp-for="CarId" class="form-control" asp-items="ViewBag.Cars">
+                    <option value="">-- Araç Seç --</option>
+                </select>
+                <span asp-validation-for="CarId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="form-label">Başlangıç Tarihi</label>
+                <input type="date" asp-for="StartDate" class="form-control" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label">Bitiş Tarihi</label>
+                <input type="date" asp-for="EndDate" class="form-control" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                Rezervasyon Yap
+            </button>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

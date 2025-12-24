@@ -16,7 +16,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@settings.SiteName</title>
+    <title>@settings.siteName</title>
     <link rel="icon" type="image/png" href="~/caricon.png">
 
     <!-- Bootstrap & FontAwesome -->
@@ -30,7 +30,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-dark border-bottom mb-3 shadow-sm">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">@settings.SiteName</a>
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">@settings.siteName</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -40,6 +40,14 @@
                         <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active-link" : "")"
                                asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "About" ? "active-link" : "")"
+                               asp-controller="Home" asp-action="About">Hakkımızda</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Create" ? "active-link" : "")"
+                               asp-controller="Reservation" asp-action="MyReservations">Rezervasyonlarım</a>
                         </li>
                         @if (User.IsInRole("Admin") || User.IsInRole("Employee"))
                         {
@@ -118,7 +126,39 @@
     
      
     <footer>
-        &copy; 2025 - @settings.CompanyEmail
+        <footer>
+            <div class="social-icons">
+                @if (@settings.igOK)
+                {
+                    <a href="@settings.igLink" target="_blank">
+                        <i class="fa-brands fa-square-instagram"></i>
+                    </a>
+                }
+                @if (@settings.xOK)
+                {
+                    <a href="@settings.xLink" target="_blank">
+                        <i class="fa-brands fa-square-x-twitter"></i>
+                    </a>
+                }
+                @if (@settings.fbOK)
+                {
+                    <a href="@settings.fbLink" target="_blank">
+                        <i class="fa-brands fa-square-facebook"></i>
+                    </a>
+                }
+                @if (@settings.ytOK)
+                {
+                    <a href="@settings.ytLink" target="_blank">
+                        <i class="fa-brands fa-square-youtube"></i>
+                    </a>
+                }
+            </div>
+        </footer>
+
+        <strong>
+            2025 © Tüm hakları saklıdır - @settings.companyEmail
+        </strong>
+        <strong>Telefon: @settings.companyPhone</strong>
     </footer>
 
     <!-- Scripts -->

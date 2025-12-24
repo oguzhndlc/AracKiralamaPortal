@@ -1,0 +1,200 @@
+﻿
+<style>
+    body {
+        background: #0b0f1a;
+        font-family: 'Segoe UI', sans-serif;    
+    }
+
+    .neon-title {
+        color: #00f5ff;
+        font-weight: 700;
+        text-shadow: 0 0 10px #00f5ff;
+        margin-bottom: 25px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+        color: #e5e7eb;
+    }
+
+    thead th {
+        font-size: 15px;
+        font-weight: 600;
+        padding-bottom: 10px;
+        color:white;
+    }
+
+    tbody tr {
+        background: #1f2937;
+        border-radius: 12px;
+        transition: all .3s ease;
+        color:white;
+    }
+
+        tbody tr:hover {
+            background: #0f172a;
+            transform: scale(1.01);
+        }
+
+    tbody td {
+        padding: 14px 16px;
+        vertical-align: middle;
+        color:white;
+    }
+
+    /* STATUS BADGES */
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: .4px;
+        color: #fff;
+        display: inline-block;
+    }
+
+    .status-wait {
+        background: linear-gradient(135deg, #facc15, #f59e0b);
+        box-shadow: 0 0 8px rgba(250,204,21,.7);
+    }
+
+    .status-approved {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        box-shadow: 0 0 8px rgba(34,197,94,.7);
+    }
+
+    .status-rejected {
+        background: linear-gradient(135deg, #ef4444, #b91c1c);
+        box-shadow: 0 0 8px rgba(239,68,68,.7);
+    }
+    .delete-btn {
+        background: transparent;
+        border: 1px solid #fff;
+        color: #fff;
+        padding: 5px 20px;
+        border-radius: 6px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+
+        .delete-btn:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+            box-shadow: 0 0 6px rgba(239,68,68,.8);
+        }
+
+</style>
+
+<div class="container mb-5">
+    <div class="neon-card">
+
+        <h4 class="neon-title">
+            <i class="bi bi-calendar-check me-2"></i> Rezervasyonlar
+        </h4>
+
+        <table class="table table-borderless align-middle">
+            <thead>
+                <tr>
+                    <th>Kullanıcı</th>
+                    <th>Başlangıç</th>
+                    <th>Bitiş</th>
+                    <th>Durum</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    <tr data-id="@r.Id">
+                        <td>@r.UserId</td>
+                        <td>@r.StartDate.ToShortDateString()</td>
+                        <td>@r.EndDate.ToShortDateString()</td>
+                        <td>
+                            @if (r.Status == "Beklemede")
+                            {
+                                <span class="status-badge status-wait">Beklemede</span>
+                            }
+                            else if (r.Status == "Onaylandı")
+                            {
+                                <span class="status-badge status-approved">Onaylandı</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-rejected">Reddedildi</span>
+                                <button class="delete-btn ms-2" onclick="deleteReservation(@r.Id)">
+                                    Sil
+                                </button>
+                            }
+                        </td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<script>
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chatHub") 
+        .withAutomaticReconnect()
+        .build();
+
+    async function start() {
+        try {
+            await connection.start();
+            console.log("SignalR connected");
+        } catch (err) {
+            console.error(err);
+            setTimeout(start, 5000); 
+        }
+    }
+    connection.onclose(start);
+    start();
+
+    connection.on("ReservationStatusChanged", function (data) {
+        const row = document.querySelector(`tr[data-id='${data.reservationId}']`);
+        if (!row) return;
+
+        const statusCell = row.querySelector("td:last-child");
+
+        if (data.status === "Reddedildi") {
+            statusCell.innerHTML = `
+                <span class="status-badge status-rejected">
+                    Reddedildi
+                    <button class="delete-btn ms-2"
+                            onclick="deleteReservation(${data.reservationId})">
+                        Sil
+                    </button>
+                </span>`;
+        }
+        else if (data.status === "Onaylandı") {
+            statusCell.innerHTML = `<span class="status-badge status-approved">Onaylandı</span>`;
+        }
+        else {
+            statusCell.innerHTML = `<span class="status-badge status-wait">Beklemede</span>`;
+        }
+    });
+
+
+        function deleteReservation(id) {
+        if (!confirm("Bu rezervasyonu silmek istiyor musunuz?")) return;
+
+        fetch(`/Reservation/Delete/${id}`, {
+            method: "POST"
+        })
+        .then(res => {
+            if (res.ok) {
+                const row = document.querySelector(`tr[data-id='${id}']`);
+                row.style.transition = "all .3s ease";
+                row.style.opacity = "0";
+                setTimeout(() => row.remove(), 300);
+            } else {
+                alert("Silme işlemi başarısız");
+            }
+        });
+    }
+</script>

@@ -12,15 +12,13 @@
         </div>
 
         <div class="card-body">
-            <form asp-action="Create" method="post" enctype="multipart/form-data" novalidate>
+            <form asp-action="Create" id="carForm" method="post" enctype="multipart/form-data" novalidate>
                 @Html.AntiForgeryToken()
-
                 <div class="row g-4">
 
                     <!-- Resim -->
                     <div class="col-md-6">
                         <label class="form-label">Resim</label>
-
                         <label class="neon-upload" id="imageLabel">
                             <span id="imageLabelText">Resim Seç</span>
                             <img id="imageInLabel" class="img-fluid rounded d-none" style="max-height:120px; margin-top:8px;" />
@@ -31,41 +29,50 @@
                         </label>
                     </div>
 
-
                     <div class="col-md-6"></div>
 
                     <!-- Temel Bilgiler -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Model</label>
                         <input asp-for="Model" class="form-control" />
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label">Yıl</label>
                         <input asp-for="Year" class="form-control" />
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label">Fiyat</label>
                         <input asp-for="Price" class="form-control" />
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-2">
                         <label class="form-label">Kilometre</label>
                         <input asp-for="Mileage" class="form-control" />
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label">Motor Gücü</label>
+                        <label class="form-label">Motor Gücü (hp)</label>
                         <input asp-for="EnginePower" class="form-control" />
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label">Motor Hacmi</label>
+                        <label class="form-label">Motor Hacmi (cc)</label>
                         <input asp-for="EngineCapacity" class="form-control" />
                     </div>
 
                     <!-- Seçimler -->
+                    <div class="col-md-6">
+                        <label class="form-label">Araç Tipi</label>
+                        <select id="VehicleTypeId" asp-for="VehicleTypeId" asp-items="ViewBag.VehicleTypes" class="form-select"></select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Araç Alt Tipi</label>
+                        <select id="VehicleSubTypeId" asp-for="VehicleSubTypeId" asp-items="ViewBag.VehicleSubTypes" class="form-select"></select>
+                    </div>
+
                     <div class="col-md-6">
                         <label class="form-label">Marka</label>
                         <select asp-for="BrandId" asp-items="ViewBag.Brands" class="form-select"></select>
@@ -85,21 +92,15 @@
                         <label class="form-label">Durum</label>
                         <select asp-for="isAvailable" class="form-select">
                             <option value="true">Müsait</option>
-                            <option value="false">Değil</option>
+                            <option value="false">Müsait Değil</option>
                         </select>
                     </div>
 
                     <!-- RENK -->
                     <div class="col-md-6">
                         <label class="form-label">Renk</label>
-
                         <div class="d-flex align-items-center gap-3 mt-2">
-                            <!-- Seçili Renk Göstergesi -->
-                            <div id="selectedColorLabel" class="selected-color-label">
-                                Renk Seçilmedi
-                            </div>
-
-                            <!-- Renkler -->
+                            <div id="selectedColorLabel" class="selected-color-label">Renk Seçilmedi</div>
                             <div class="color-badges" id="colorBadges">
                                 <span class="color-badge" data-color="Siyah" style="--c:#000000"></span>
                                 <span class="color-badge" data-color="Beyaz" style="--c:#ffffff"></span>
@@ -122,14 +123,12 @@
                                 <span class="color-badge" data-color="Pembe" style="--c:#ec4899"></span>
                             </div>
                         </div>
-
                         <input asp-for="Color" type="hidden" id="Color" />
                     </div>
 
                     <!-- Donanım -->
                     <div class="col-md-6">
                         <label class="form-label">Donanım</label>
-
                         <input type="hidden" name="HasAC" value="false" />
                         <label class="neon-toggle">
                             <input asp-for="HasAC" value="true" />
@@ -148,102 +147,86 @@
                 </div>
 
                 <div class="d-flex justify-content-between mt-4">
-                    <a asp-action="Index" class="back-btn">
-                        Geri Dön
-                    </a>
-
-                    <button type="submit" class="neon-btn">
-                        Kaydet
-                    </button>
+                    <a asp-action="Index" class="back-btn">Geri Dön</a>
+                    <button type="submit" class="neon-btn">Kaydet</button>
                 </div>
 
             </form>
         </div>
     </div>
 </div>
+
 <script src="~/js/site.js"></script>
 <script>
-    /* === RESİM ÖNİZLEME (EDIT) === */
-    function previewNewImage(e) {
-        const box = document.getElementById("newPreviewBox");
-        const img = document.getElementById("newPreviewImg");
+    document.addEventListener("DOMContentLoaded", function () {
+        const vehicleTypeDropdown = document.getElementById("VehicleTypeId");
+        const vehicleSubTypeDropdown = document.getElementById("VehicleSubTypeId");
 
-        if (box && img) {
-            box.classList.remove("d-none");
-            img.src = URL.createObjectURL(e.target.files[0]);
+        function loadSubTypes(typeId, selectedSubTypeId = null) {
+            if (!typeId) return;
+
+            fetch(`/Car/GetSubTypes?vehicleTypeId=${typeId}`)
+                .then(res => res.json())
+                .then(data => {
+                    vehicleSubTypeDropdown.innerHTML = '';
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.text = 'Araç Alt Tipi Seçin';
+                    vehicleSubTypeDropdown.appendChild(defaultOption);
+
+                    data.forEach(subType => {
+                        const option = document.createElement('option');
+                        option.value = subType.id;
+                        option.text = subType.name;
+                        if (selectedSubTypeId && subType.id == selectedSubTypeId) {
+                            option.selected = true;
+                        }
+                        vehicleSubTypeDropdown.appendChild(option);
+                    });
+                })
+                .catch(err => console.error('Alt tipler yüklenemedi:', err));
         }
-    }
 
-    /* === RENK SEÇİM === */
-    const badges = document.querySelectorAll(".color-badge");
-    const input = document.getElementById("Color");
-    const label = document.getElementById("selectedColorLabel");
+        // İlk yüklemede alt tipleri yükle
+        const initialTypeId = vehicleTypeDropdown.value;
+        const initialSubTypeId = '@Model?.VehicleSubTypeId' || '';
+        loadSubTypes(initialTypeId, initialSubTypeId);
 
-    badges.forEach(badge => {
-
-        // EDIT SAYFASI → mevcut renk otomatik seçili gelsin
-        if (input && badge.dataset.color === input.value) {
-            selectColor(badge);
-        }
-
-        badge.addEventListener("click", () => {
-            selectColor(badge);
+        vehicleTypeDropdown.addEventListener("change", function () {
+            loadSubTypes(this.value);
         });
+
+        // Renk seçimi
+        const badges = document.querySelectorAll(".color-badge");
+        const input = document.getElementById("Color");
+        const label = document.getElementById("selectedColorLabel");
+
+        badges.forEach(badge => {
+            if (input && badge.dataset.color === input.value) selectColor(badge);
+            badge.addEventListener("click", () => selectColor(badge));
+        });
+
+        function selectColor(badge) {
+            badges.forEach(b => b.classList.remove("selected"));
+            badge.classList.add("selected");
+            if (label) {
+                const bg = badge.style.getPropertyValue("--c");
+                label.textContent = badge.dataset.color;
+                label.style.backgroundColor = bg;
+                label.style.color = bg === "#ffffff" ? "#000" : "#fff";
+            }
+            if (input) input.value = badge.dataset.color;
+        }
     });
 
-    function selectColor(badge) {
-        badges.forEach(b => b.classList.remove("selected"));
-        badge.classList.add("selected");
-
-        if (label) {
-            const bg = badge.style.getPropertyValue("--c");
-            label.textContent = badge.dataset.color;
-            label.style.backgroundColor = bg;
-            label.style.color = bg === "#ffffff" ? "#000" : "#fff";
-        }
-
-        if (input) {
-            input.value = badge.dataset.color;
-        }
-    }
-    /*document.getElementById("carForm").addEventListener("submit", function (e) {
-        const inputs = [
-            document.querySelector('[name="Model"]'),
-            document.querySelector('[name="Price"]'),
-            document.querySelector('[name="Mileage"]'),
-            document.getElementById("Color")
-        ];
-
-        const messages = [
-            "Model alanı boş bırakılamaz",
-            "Fiyat alanı boş bırakılamaz",
-            "Kilometre alanı boş bırakılamaz",
-            "Renk alanı boş bırakılamaz"
-        ];
-
-        for (let i = 0; i < inputs.length; i++) {
-            if (!inputs[i].value.trim()) {
-                e.preventDefault();
-                showToast(messages[i], "error");
-                inputs[i].focus();
-                return;
-            }
-        }
-    });*/
-
-
-        function previewNewImageInLabel(e) {
+    // Resim önizleme
+    function previewNewImageInLabel(e) {
         const labelText = document.getElementById("imageLabelText");
         const imgInLabel = document.getElementById("imageInLabel");
-
         if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            imgInLabel.src = URL.createObjectURL(file);
+            imgInLabel.src = URL.createObjectURL(e.target.files[0]);
             imgInLabel.classList.remove("d-none");
-
-            // İsteğe bağlı: yazıyı gizleyebilirsin
             labelText.style.display = "none";
         }
     }
-
 </script>

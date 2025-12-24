@@ -159,5 +159,9 @@ namespace AracKiralamaPortal.Hubs
 
             return (sender.Key, sender.Value.Username);
         }
+        public async Task NotifyNewReservation(object reservation)
+        {
+            await Clients.All.SendAsync("NewReservationArrived", reservation);
+        }
     }
 }

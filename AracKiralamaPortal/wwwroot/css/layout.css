@@ -188,7 +188,6 @@
 }
 
 main {
-    /* DÜZELT: Flexbox yönetimi nedeniyle artık min-height gerekmiyor */
     min-height: auto;
 }
 
@@ -200,3 +199,52 @@ footer {
     padding: 20px 0;
     font-size: .85rem;
 }
+    footer strong {
+        display: block;
+        margin: 5px 5px;
+        color: white;
+        font-size: 15px;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.6);
+    }
+    footer a {
+        height: 50px;
+        width: 50px;
+        margin: 0 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease, transform 0.3s ease, text-shadow 0.3s ease;
+        border-radius: 8px;
+    }
+
+
+        footer a:hover {
+            background-color: darkblue;
+        }
+        footer a i {
+            font-size: 50px;
+            color: white;
+            transition: transform 0.3s ease, text-shadow 0.3s ease;
+        }
+        footer a:hover i {
+            transform: scale(1.2) rotate(10deg);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+        footer a[href*="instagram"]:hover {
+            background-color: #E1306C;
+        }
+
+        footer a[href*="x"]:hover {
+            background-color:black; 
+        }
+
+        footer a[href*="facebook"]:hover {
+            background-color: #1877F2;
+        }
+
+        footer a[href*="youtube"]:hover {
+            background-color: #FF0000;
+        }
+
+
+

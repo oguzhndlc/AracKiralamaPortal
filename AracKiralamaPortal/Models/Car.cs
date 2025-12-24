@@ -18,6 +18,13 @@ namespace AracKiralamaPortal.Models
         [DataType(DataType.Currency)]
         public decimal Price { get; set; }
 
+        [Required(ErrorMessage = "Lütfen araç tipini seçin.")]
+        public int? VehicleTypeId { get; set; }
+        public VehicleType? VehicleType { get; set; } = null!;
+            
+        [Required(ErrorMessage = "Lütfen araç alt tipini seçin.")]
+        public int? VehicleSubTypeId { get; set; }
+        public VehicleSubType? VehicleSubType { get; set; } = null!;
 
         [Required(ErrorMessage = "Lütfen bir marka seçin.")]
         public int BrandId { get; set; }

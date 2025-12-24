@@ -4,6 +4,7 @@
     ViewData["Title"] = "Site Ayarları";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
+
 @if (User.IsInRole("Admin"))
 {
 <style>
@@ -12,14 +13,14 @@
         font-family: 'Segoe UI', sans-serif;
     }
 
-    /* CARD */
     .neon-card {
         background: #111827;
         border-radius: 20px;
         border: 2px solid rgba(0, 245, 255, 0.2);
         box-shadow: 0 0 40px rgba(0, 245, 255, 0.1);
         padding: 30px;
-        width: 50%;
+        width: 70%;
+        max-width: 900px;
         margin: 50px auto;
     }
 
@@ -32,8 +33,7 @@
         text-align: center;
     }
 
-    /* FORM INPUT */
-    .neon-card input {
+    .neon-card input, .neon-card select {
         width: 100%;
         padding: 12px 16px;
         margin-top: 6px;
@@ -48,12 +48,11 @@
         box-shadow: 0 0 10px rgba(0,245,255,0.1);
     }
 
-        .neon-card input:focus {
-            border-color: #00f5ff;
-            box-shadow: 0 0 15px rgba(0,245,255,0.6);
-        }
+    .neon-card input:focus {
+        border-color: #00f5ff;
+        box-shadow: 0 0 15px rgba(0,245,255,0.6);
+    }
 
-    /* BUTTON */
     .neon-card button {
         display: block;
         width: 100%;
@@ -69,12 +68,11 @@
         box-shadow: 0 0 10px rgba(34,197,94,0.5);
     }
 
-        .neon-card button:hover {
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 0 25px rgba(34,197,94,0.8);
-        }
+    .neon-card button:hover {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 0 25px rgba(34,197,94,0.8);
+    }
 
-    /* ALERT */
     .alert {
         background: linear-gradient(135deg, #3b82f6, #06b6d4);
         color: #fff;
@@ -83,6 +81,106 @@
         box-shadow: 0 0 15px rgba(3,105,161,0.6);
         text-align: center;
         margin-bottom: 20px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .toggle-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 6px;
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 46px;
+        height: 24px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background-color: #374151;
+        border-radius: 999px;
+        transition: .3s;
+        box-shadow: 0 0 8px rgba(0,245,255,.3);
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: #9ca3af;
+        border-radius: 50%;
+        transition: .3s;
+    }
+
+    .toggle-switch input:checked + .slider {
+        background-color: #00f5ff;
+        box-shadow: 0 0 12px rgba(0,245,255,.8);
+    }
+
+    .toggle-switch input:checked + .slider:before {
+        transform: translateX(22px);
+        background-color: #022c22;
+    }
+
+    .toggle-label {
+        color: #e5e7eb;
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    /* Logo upload as dropzone */
+    .logo-dropzone {
+        position: relative;
+        width: 100%;
+        height: 150px;
+        border: 2px dashed rgba(0,245,255,0.5);
+        border-radius: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        overflow: hidden;
+        background: #1f2937;
+        text-align: center;
+        color: #9ca3af;
+        transition: border-color 0.3s;
+    }
+
+    .logo-dropzone:hover {
+        border-color: #00f5ff;
+    }
+
+    .logo-dropzone img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .logo-dropzone input[type=file] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
     }
 </style>
 
@@ -94,32 +192,112 @@
         <div class="alert">@ViewBag.Message</div>
     }
 
-    <form method="post">
-        <div class="form-group">
-            <label>Site İsmi</label>
-            <input name="SiteName" value="@Model.SiteName" />
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-grid">
+            <div>
+                <label>Site İsmi</label>
+                <input name="siteName" value="@Model.siteName" />
+            </div>
+            <div>
+                <label>Şirket Telefon</label>
+                <input name="companyPhone" value="@Model.companyPhone" />
+            </div>
+            <div>
+                <label>Şirket Email</label>
+                <input name="companyEmail" value="@Model.companyEmail" />
+            </div>
+            <div>
+                <label>Şirket Adres</label>
+                <input name="companyAddress" value="@Model.companyAddress" />
+            </div>
+            <div>
+                <label>Enlem</label>
+                <input name="latitude" value="@Model.latitude" />
+            </div>
+            <div>
+                <label>Boylam</label>
+                <input name="longitude" value="@Model.longitude" />
+            </div>
+            <div>
+                <label>Logo Yükle</label>
+                <div class="logo-dropzone" id="logoDropzone">
+                        @if (Model.siteLogo == null)
+                            {
+                                Model.siteLogo = "default_logo.png";
+                            }
+                            <span id="logoPlaceholder">@(!string.IsNullOrEmpty(Model.siteLogo) ? "" : "Logo seçmek için tıklayın")</span>
+                    <img id="logoPreview" src="@(!string.IsNullOrEmpty(Model.siteLogo) ? Url.Content("~/images/site/" + Model.siteLogo) : "")" alt="Logo Önizleme" class="@(!string.IsNullOrEmpty(Model.siteLogo) ? "" : "d-none")" />
+                    <input type="file" name="siteLogoFile" id="siteLogoFile" accept="image/*" onchange="previewNewImageInLabel(event)" />
+                </div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label>Şirket Telefon</label>
-            <input name="CompanyPhone" value="@Model.CompanyPhone" />
+        <h4 class="neon-title" style="font-size:1.3rem;">Sosyal Medya</h4>
+        <div class="form-grid">
+            <div>
+                <div class="toggle-row">
+                    <label class="toggle-switch">
+                        <input type="checkbox" name="igOK" value="true" @(Model.igOK ? "checked" : "") />
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label">Instagram</span>
+                </div>
+                <input name="igLink" value="@Model.igLink" placeholder="Instagram URL" />
+            </div>
+            <div>
+                <div class="toggle-row">
+                    <label class="toggle-switch">
+                        <input type="checkbox" name="xOK" value="true" @(Model.xOK ? "checked" : "") />
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label">X (Twitter)</span>
+                </div>
+                <input name="xLink" value="@Model.xLink" placeholder="X URL" />
+            </div>
+            <div>
+                <div class="toggle-row">
+                    <label class="toggle-switch">
+                        <input type="checkbox" name="fbOK" value="true" @(Model.fbOK ? "checked" : "") />
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label">Facebook</span>
+                </div>
+                <input name="fbLink" value="@Model.fbLink" placeholder="Facebook URL" />
+            </div>
+            <div>
+                    <div class="toggle-row">
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="ytOK" value="true" @(Model.ytOK ? "checked" : "") />
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">YouTube</span>
+                    </div>
+                    <input name="ytLink" value="@Model.ytLink" placeholder="YouTube URL" />
+            </div>
         </div>
-
-        <div class="form-group">
-            <label>Şirket Email</label>
-            <input name="CompanyEmail" value="@Model.CompanyEmail" />
-        </div>
-
         <button type="submit">Kaydet</button>
-    </form>
+  </form>
 </div>
+
+<script>
+        function previewNewImageInLabel(e) {
+            const labelText = document.getElementById("logoPlaceholder");
+            const imgInLabel = document.getElementById("logoPreview");
+
+            if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
+                imgInLabel.src = URL.createObjectURL(file); 
+                imgInLabel.classList.remove("d-none");      
+                labelText.style.display = "none";           
+            }
+        }
+</script>
 }
 else
 {
     <div class="container mt-5 text-center">
         <h1 class="text-danger">⛔ Yetkisiz Erişim</h1>
         <p>Bu sayfaya erişim yetkiniz yok.</p>
-
         <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-primary mt-3">
             Ana Sayfaya Dön
         </a>

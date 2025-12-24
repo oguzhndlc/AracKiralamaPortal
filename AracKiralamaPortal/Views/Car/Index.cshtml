@@ -122,47 +122,86 @@
             color: white;
         }
 
+    .col-md-3 {
+            margin:10px;
+        }
+
 </style>
 
 <div class="container mt-5 mb-5">
 
     <div class="card neon-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="neon-title mb-0">
+                    <i class="bi bi-car-front-fill me-2"></i> Araçlar
+                </h4>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="neon-title mb-0">
-                <i class="bi bi-car-front-fill me-2"></i> Araçlar
-            </h4>
-
-            <a href="/Car/Create" class="neon-btn">
-                + Yeni Araç
-            </a>
-        </div>
-        <!-- Filtre -->
-        <div class="row g-3 mb-4">
-
-            <div class="col-md-4">
-                <input type="text"
-                       id="filterModel"
-                       class="form-control neon-input"
-                       placeholder="🔍 Model ara">
+                <div>
+                    <button id="advancedFilterBtn" class="neon-btn">Gelişmiş Filtreleme</button>
+                    <a href="/Car/Create" class="neon-btn">+ Yeni Araç</a>
+                </div>
             </div>
 
-            <div class="col-md-4">
-                <select id="filterBrand" class="form-select neon-input">
-                    <option value="">Tüm Markalar</option>
-                    @foreach (var brand in Model.Select(x => x.Brand.Name).Distinct())
-                    {
-                        <option value="@brand">@brand</option>
-                    }
-                </select>
-            </div>
+            <!-- Gelişmiş filtre paneli (başta gizli) -->
+            <div id="advancedFilterPanel" class="mb-4 p-3" style="display:none; background:#111827; border-radius:12px; border:1px solid rgba(0,245,255,.2);">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <input type="text" id="filterModelAdv" class="form-control neon-input" placeholder="Model">
+                    </div>
+                    <div class="col-md-3">
+                        <select id="filterBrandAdv" class="form-select neon-input">
+                            <option value="">Tüm Markalar</option>
+                            @foreach (var brand in Model.Select(x => x.Brand?.Name).Distinct())
+                            {
+                                <option value="@brand">@brand</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select id="filterVehicleTypeAdv" class="form-select neon-input">
+                            <option value="">Tüm Tipler</option>
+                            @foreach (var type in Model.Select(x => x.VehicleType?.Name).Distinct())
+                            {
+                                <option value="@type">@type</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select id="filterVehicleSubTypeAdv" class="form-select neon-input">
+                            <option value="">Tüm Alt Tipler</option>
+                            @foreach (var subType in Model.Select(x => x.VehicleSubType?.Name).Distinct())
+                            {
+                                <option value="@subType">@subType</option>
+                            }
+                        </select>
+                    </div>
 
-            <div class="col-md-4">
-                <select id="filterStatus" class="form-select neon-input">
-                    <option value="">Tüm Durumlar</option>
-                    <option value="Müsait">Müsait</option>
-                    <option value="Müsait Değil">Müsait Değil</option>
-                </select>
+                    <!-- Daha fazla filtre ekleyebilirsin, örneğin: Yıl aralığı, Fiyat aralığı -->
+                    <div class="col-md-2">
+                        <input type="number" id="filterYearMin" class="form-control neon-input" placeholder="Min Yıl">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" id="filterYearMax" class="form-control neon-input" placeholder="Max Yıl">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" id="filterPriceMin" class="form-control neon-input" placeholder="Min Fiyat">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" id="filterPriceMax" class="form-control neon-input" placeholder="Max Fiyat">
+                    </div>
+
+                    <div class="col-md-2">
+                        <select id="filterStatusAdv" class="form-select neon-input">
+                            <option value="">Tüm Durumlar</option>
+                            <option value="Müsait">Müsait</option>
+                            <option value="Müsait Değil">Müsait Değil</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button id="applyAdvancedFilter" class="neon-btn w-100">Uygula</button>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -175,6 +214,8 @@
                     <th>Yıl</th>
                     <th>Fiyat</th>
                     <th>Marka</th>
+                    <th>Araç Tipi</th>
+                    <th>Araç Alt Tipi</th>
                     <th>Durum</th>
                     <th>Resim</th>
                     <th class="text-end">İşlemler</th>
@@ -189,7 +230,9 @@
                         <td>@item.Model</td>
                         <td>@item.Year</td>
                         <td>@item.Price ₺</td>
-                        <td>@item.Brand.Name</td>
+                        <td>@item.Brand?.Name</td>
+                        <td>@item.VehicleType?.Name</td>
+                        <td>@item.VehicleSubType?.Name</td>
 
                         <td>
                             <span id="status_@item.Id"
@@ -304,5 +347,44 @@
         $("#filterModel").on("input", applyFilters);
         $("#filterBrand").on("change", applyFilters);
         $("#filterStatus").on("change", applyFilters);
+    });
+
+        document.getElementById("advancedFilterBtn").addEventListener("click", function() {
+        const panel = document.getElementById("advancedFilterPanel");
+        panel.style.display = panel.style.display === "none" ? "block" : "none";
+    });
+
+    document.getElementById("applyAdvancedFilter").addEventListener("click", function() {
+        const modelFilter = $("#filterModelAdv").val().toLowerCase().trim();
+        const brandFilter = $("#filterBrandAdv").val().toLowerCase().trim();
+        const typeFilter = $("#filterVehicleTypeAdv").val().toLowerCase().trim();
+        const subTypeFilter = $("#filterVehicleSubTypeAdv").val().toLowerCase().trim();
+        const statusFilter = $("#filterStatusAdv").val().toLowerCase().trim();
+        const yearMin = parseInt($("#filterYearMin").val()) || 0;
+        const yearMax = parseInt($("#filterYearMax").val()) || Infinity;
+        const priceMin = parseFloat($("#filterPriceMin").val()) || 0;
+        const priceMax = parseFloat($("#filterPriceMax").val()) || Infinity;
+
+        $("tbody tr").each(function() {
+            const tds = $(this).find("td");
+            const model = tds.eq(1).text().toLowerCase();
+            const brand = tds.eq(4).text().toLowerCase();
+            const type = tds.eq(5).text().toLowerCase();
+            const subType = tds.eq(6).text().toLowerCase();
+            const status = tds.eq(7).text().toLowerCase();
+            const year = parseInt(tds.eq(2).text()) || 0;
+            const price = parseFloat(tds.eq(3).text()) || 0;
+
+            const match =
+                (modelFilter === "" || model.includes(modelFilter)) &&
+                (brandFilter === "" || brand === brandFilter) &&
+                (typeFilter === "" || type === typeFilter) &&
+                (subTypeFilter === "" || subType === subTypeFilter) &&
+                (statusFilter === "" || status === statusFilter) &&
+                year >= yearMin && year <= yearMax &&
+                price >= priceMin && price <= priceMax;
+
+            $(this).toggle(match);
+        });
     });
 </script>

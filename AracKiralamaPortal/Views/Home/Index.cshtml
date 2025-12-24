@@ -37,7 +37,12 @@
                         <div class="car-price">
                             @car.Price ₺ <span>/gün</span>
                         </div>
-                        <a asp-controller="Home" asp-action="Chat" class="rent-btn">Hemen Kirala</a>
+                        <a asp-controller="Reservation"
+                           asp-action="Create"
+                           asp-route-carId="@car.Id"
+                           class="rent-btn">
+                            Hemen Kirala
+                        </a>
                     </div>
 
                 </div>
